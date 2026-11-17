@@ -197,7 +197,8 @@ def parse_result(page):
             for key, i in idx.items():
                 if key != "fecha" and i < len(r):
                     o[key] = num(r[i])
-            rows.append(o)
+            if any(v is not None for k, v in o.items() if k != "fecha"):  # descarta días aún sin datos (p. ej. hoy)
+                rows.append(o)
         if rows:
             rows.sort(key=lambda x: x["fecha"])
             return rows, t[hi]
