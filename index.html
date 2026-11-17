@@ -5,17 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AgroPanel · Panel del técnico agrícola</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f3f5ef;--card:#fff;--ink:#1e2a1b;--muted:#646f5d;--line:#e0e5d9;
-  --brand:#2f6b3a;--brand-d:#24552d;--brand-l:#e8f1e5;
-  --warn:#9a6312;--warnbg:#fdf2dd;--bad:#a8362a;--badbg:#fbe7e3;
-  --ok:#2c7246;--okbg:#e4f3e8;--info:#2b5c86;--infobg:#e6eff8;
-  --r:12px;--sh:0 1px 2px rgba(30,42,27,.06),0 2px 8px rgba(30,42,27,.05);
+  /* Paleta de campo: del verde bosque de los cítricos al verde tierno del arrozal. Diseño: cabecera de bosque, portal de mosaicos con un tono de verde por sección. */
+  --forest:#0d3b22;--pine:#1d6337;--leaf:#3a9150;--sage:#8cbd86;--mint:#dff0d8;--lime:#b7d43d;
+  --bg:#eef4ea;--card:#ffffff;--ink:#14281a;--muted:#5a6d5d;--line:#d9e5d3;
+  --brand:#1d6337;--brand-d:#0d3b22;--brand-l:#e3f1dd;
+  --warn:#93600f;--warnbg:#fcf1db;--bad:#a2342a;--badbg:#fbe6e2;
+  --ok:#25703f;--okbg:#e1f2e5;--info:#255b80;--infobg:#e4eef7;
+  --fd:"Bricolage Grotesque","Figtree",system-ui,sans-serif;--fb:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px;--sh:0 1px 2px rgba(13,59,34,.06),0 4px 14px rgba(13,59,34,.06);
+  color-scheme:light;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--fb)}
 a{color:var(--brand)}
 h1,h2,h3{margin:0;line-height:1.2}
 h2{font-size:20px}
@@ -178,6 +182,70 @@ th.mc{text-align:center;padding:6px 2px}
 th.mc.cur{color:var(--brand-d)}
 .progress{height:6px;background:#eef0ea;border-radius:9px;overflow:hidden;margin-top:4px}
 .progress b{display:block;height:100%;background:var(--bad)}
+
+/* ===== Tema verde ===== */
+h1,h2,h3,.tt,.kpi .v,.logo,.wx-now .t{font-family:var(--fd);letter-spacing:-.015em;text-wrap:balance}
+header.top{background:radial-gradient(1200px 120px at 85% -40px,rgba(183,212,61,.25),transparent 70%),repeating-linear-gradient(112deg,rgba(255,255,255,.04) 0 2px,transparent 2px 16px),linear-gradient(110deg,var(--forest),var(--pine) 65%,#2a7a45);box-shadow:0 4px 18px rgba(13,59,34,.25)}
+.logo .lm{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,var(--lime),var(--leaf));color:var(--forest);box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.logo{font-size:20px;font-weight:800}
+.logo small{font-family:var(--fb);opacity:.75;font-weight:500}
+nav.tabs a{border-radius:99px;font-weight:600}
+nav.tabs a.on{background:var(--lime);color:var(--forest)}
+.loc-pill{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.loc-pill .ic{color:var(--lime)}
+.btn{border-radius:10px;font-weight:600;transition:background .15s,border-color .15s,box-shadow .15s}
+.btn.pri{background:linear-gradient(180deg,var(--leaf),var(--pine));border-color:var(--pine);box-shadow:0 2px 6px rgba(29,99,55,.25)}
+.btn.pri:hover{background:linear-gradient(180deg,#358a4a,var(--forest))}
+.btn:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.card{border-radius:var(--r)}
+.card h3{color:var(--forest)}
+.card h3 .ic{color:var(--leaf)}
+.kpi .v{color:var(--forest)}
+.hub-hero{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--mint),#f4f9f0 60%);border:1px solid var(--line);border-radius:18px;padding:26px 28px;margin-top:6px}
+.hub-hero::after{content:"";position:absolute;right:230px;bottom:-60px;width:200px;height:200px;opacity:.14;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d6337' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21v-9'/%3E%3Cpath d='M12 13C12 8.6 8.9 5.5 4.5 5.5 4.5 9.9 7.6 13 12 13z'/%3E%3Cpath d='M12 11c0-3.9 2.7-6.6 6.6-6.6 0 3.9-2.7 6.6-6.6 6.6z'/%3E%3C/svg%3E");pointer-events:none}
+.hub-hero h1{font-size:30px;color:var(--forest)}
+.hub-hero>*{position:relative;z-index:1}
+.hub-sub{font-family:var(--fd);color:var(--forest);display:flex;align-items:center;gap:10px}
+.home2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){.home2{grid-template-columns:1fr}}
+.hub-sub::before{content:"";width:28px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--lime),var(--leaf))}
+.tile{--tc:var(--leaf);--tl:var(--mint);position:relative;overflow:hidden;border-radius:18px;padding:20px;border-top:5px solid var(--tc)}
+.tile .ti{width:50px;height:50px;border-radius:14px;background:var(--tl);color:var(--tc)}
+.tile .ti .ic{width:26px;height:26px}
+.tile .tt{font-size:19px;color:var(--forest)}
+.tile .ts{color:var(--tc);background:var(--tl);border-radius:8px;padding:5px 9px;align-self:flex-start}
+.tile .go{color:var(--tc)}
+.tile::after{content:"";position:absolute;right:-24px;top:-24px;width:90px;height:90px;border-radius:50%;background:var(--tl);opacity:.55}
+.tile:hover{border-color:var(--tc);border-top-color:var(--tc);box-shadow:0 12px 26px rgba(13,59,34,.14)}
+.tile.t-tiempo{--tc:#2e8a5c;--tl:#dff2e8}
+.tile.t-parcelas{--tc:#4b7f1f;--tl:#e8f2d6}
+.tile.t-cuaderno{--tc:#1d6337;--tl:#dcefe0}
+.tile.t-alertas{--tc:#6f8a12;--tl:#eff5d2}
+.tile.t-ajustes{--tc:#3f6b57;--tl:#e3ede8}
+.phero{position:relative;overflow:hidden;border-radius:20px;background:repeating-linear-gradient(112deg,rgba(255,255,255,.05) 0 2px,transparent 2px 18px),linear-gradient(120deg,var(--forest),var(--pine) 55%,var(--leaf))}
+.phero h1{display:flex;align-items:center;gap:12px;font-size:28px}
+.phero .phi{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(183,212,61,.22);color:var(--lime);flex:none}
+.phero .phi .ic{width:26px;height:26px}
+.phero .phead .btn{background:rgba(255,255,255,.94)}
+.phero::after{content:"";position:absolute;right:-20px;top:-30px;width:220px;height:220px;opacity:.08;pointer-events:none;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 19c0-8 6-14 15-14 0 9-6 15-14 15H5z'/%3E%3Cpath d='M5 19l8-8'/%3E%3C/svg%3E")}
+.phero>*{position:relative;z-index:1}
+.subnav a.on{background:var(--bg);color:var(--forest)}
+.day{border-radius:14px;background:linear-gradient(180deg,#f3faf0,#fff 55%)}
+.day .ic{display:flex;justify-content:center;color:var(--pine)}
+.day .ic .ic{width:32px;height:32px}
+.ic-sun{color:#a9a21c}.ic-partly{color:#5f8f2a}
+.day .muted{display:flex;align-items:center;justify-content:center;gap:4px}
+.day .muted .ic{width:14px;height:14px;color:var(--leaf)}
+.wx-now .ic>.ic,.wx-now>.ic .ic{width:52px;height:52px}
+.wx-now>.ic{color:var(--pine)}
+.banner .ic{flex:none;margin-top:1px}
+.badge{border-radius:99px}
+th{background:#f3f8f0;color:var(--pine)}
+.months span.on{background:#c9e4bf}
+td.mc span.on{background:#b5d9a8}
+.hc.g{background:#6fbf7f}
+.foot{border-top:1px solid var(--line);padding-top:18px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* --- Leaflet esencial (inlined) --- */
 .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
 .leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent;font:13px/1.4 Inter,system-ui,sans-serif;outline-offset:1px}
@@ -231,13 +299,13 @@ th.mc.cur{color:var(--brand-d)}
 <header class="top">
   <div class="topin">
     <div class="logo">
-      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#fff" opacity=".15"/><path d="M16 26V12M16 17c-4 0-7-3-7-7 4 0 7 3 7 7zm0-2c0-4 3-7 7-7 0 4-3 7-7 7z" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="lm"><svg class="ic ic-sprout" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 13C12 8.6 8.9 5.5 4.5 5.5 4.5 9.9 7.6 13 12 13z"/><path d="M12 11c0-3.9 2.7-6.6 6.6-6.6 0 3.9-2.7 6.6-6.6 6.6z"/></svg></span>
       <div>AgroPanel<small>Panel del técnico agrícola</small></div>
     </div>
     <div class="locwrap">
-      <button class="loc-pill" id="locBtn" data-act="toggleLoc" title="Cambiar ubicación">📍 <span id="locTxt">—</span> ▾</button>
+      <button class="loc-pill" id="locBtn" data-act="toggleLoc" title="Cambiar ubicación"><svg class="ic ic-pin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 0 1 13 0c0 5.2-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg> <span id="locTxt">—</span> ▾</button>
       <div class="locpop" id="locPop" hidden>
-        <button class="btn pri" data-act="geoMe" style="width:100%;justify-content:center">📍 Usar mi ubicación actual</button>
+        <button class="btn pri" data-act="geoMe" style="width:100%;justify-content:center"><svg class="ic ic-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 0 1 13 0c0 5.2-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg> Usar mi ubicación actual</button>
         <div id="geoMsg" class="small muted" style="margin:6px 0 10px"></div>
         <input id="locQ" placeholder="Buscar municipio o provincia (p. ej. Castellón)" autocomplete="off" style="width:100%">
         <div id="locRes" class="locres"></div>
@@ -266,11 +334,11 @@ th.mc.cur{color:var(--brand-d)}
     </div>
     <div class="tiles" id="hubTiles"></div>
     <h2 class="hub-sub">Hoy en tu zona</h2>
-    <div class="grid g2">
-      <div class="card"><h3>Tiempo y ventana de tratamiento</h3><div id="homeWx"></div></div>
-      <div class="card"><h3>Alertas activas en tus cultivos</h3><div id="homeAlerts"></div></div>
-      <div class="card"><h3>Plazos de seguridad en curso</h3><div id="homePS"></div></div>
-      <div class="card"><h3>Últimas aplicaciones</h3><div id="homeLast"></div></div>
+    <div class="grid g2 home2">
+      <div class="card"><h3><svg class="ic ic-spray" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h6v11a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/><path d="M10 9V6h4v3M14 6h3l1-2M18 7l2-1M18 10l2 1M18 8.5h3"/></svg> Tiempo y ventana de tratamiento</h3><div id="homeWx"></div></div>
+      <div class="card"><h3><svg class="ic ic-bug" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10a4 4 0 0 1 8 0v4a4 4 0 0 1-8 0z"/><path d="M12 10v8M8 13H4M20 13h-4M8 17l-3 2M16 17l3 2M8.6 8.2L6 6M15.4 8.2L18 6M10 6.3L9 4M14 6.3L15 4"/></svg> Alertas activas en tus cultivos</h3><div id="homeAlerts"></div></div>
+      <div class="card"><h3><svg class="ic ic-shield" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg> Plazos de seguridad en curso</h3><div id="homePS"></div></div>
+      <div class="card"><h3><svg class="ic ic-clock" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Últimas aplicaciones</h3><div id="homeLast"></div></div>
     </div>
   </section>
 
@@ -278,7 +346,7 @@ th.mc.cur{color:var(--brand-d)}
   <section class="view" id="v-tiempo">
     <div class="phero">
       <a href="#inicio" class="back">← Volver al inicio</a>
-      <div class="phead"><div><h1>🌤️ Tiempo y estación</h1><p>Predicción de tu zona, horas aptas para tratar y datos reales de tu estación agroclimática.</p></div>
+      <div class="phead"><div><h1><span class="phi"><svg class="ic ic-partly" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v1.5M3.2 4.2l1 1M2 9h1.5M12.8 4.2l-1 1"/><path d="M5.2 11.5A3.5 3.5 0 1 1 11.6 8"/><path d="M9 20h8.5a3.5 3.5 0 0 0 .3-7A5 5 0 0 0 8.3 14 3 3 0 0 0 9 20z"/></svg></span>Tiempo y estación</h1><p>Predicción de tu zona, horas aptas para tratar y datos reales de tu estación agroclimática.</p></div>
         <button class="btn" data-act="recargarWx">Actualizar predicción</button></div>
       <nav class="subnav"><a href="#tiempo-prediccion" data-sub="prediccion">Predicción</a><a href="#tiempo-ventanas" data-sub="ventanas">Ventanas de tratamiento</a><a href="#tiempo-estacion" data-sub="estacion">Estación agroclimática</a></nav>
     </div>
@@ -314,7 +382,7 @@ th.mc.cur{color:var(--brand-d)}
   <section class="view" id="v-parcelas">
     <div class="phero">
       <a href="#inicio" class="back">← Volver al inicio</a>
-      <div class="phead"><div><h1>🗺️ Parcelas y recintos SIGPAC</h1><p>Localiza tus recintos, dibújalos o impórtalos, y asígnales cultivo y comarca.</p></div>
+      <div class="phead"><div><h1><span class="phi"><svg class="ic ic-map" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span>Parcelas y recintos SIGPAC</h1><p>Localiza tus recintos, dibújalos o impórtalos, y asígnales cultivo y comarca.</p></div>
         <button class="btn" data-act="nuevaParcSinMapa">+ Parcela sin mapa</button></div>
       <nav class="subnav"><a href="#parcelas-mapa" data-sub="mapa">Mapa</a><a href="#parcelas-listado" data-sub="listado">Listado y superficies</a></nav>
     </div>
@@ -343,7 +411,7 @@ th.mc.cur{color:var(--brand-d)}
   <section class="view" id="v-cuaderno">
     <div class="phero">
       <a href="#inicio" class="back">← Volver al inicio</a>
-      <div class="phead"><div><h1>📒 Cuaderno de aplicaciones</h1><p>Registro de fitosanitarios y fertilizantes por parcela, plazos de seguridad, balance de unidades fertilizantes y exportación.</p></div>
+      <div class="phead"><div><h1><span class="phi"><svg class="ic ic-book" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3M3 7h3M3 12h3M3 17h3"/></svg></span>Cuaderno de aplicaciones</h1><p>Registro de fitosanitarios y fertilizantes por parcela, plazos de seguridad, balance de unidades fertilizantes y exportación.</p></div>
         <button class="btn pri" data-act="nuevoTrat">+ Nueva aplicación</button></div>
       <nav class="subnav"><a href="#cuaderno-registro" data-sub="registro">Registro</a><a href="#cuaderno-plazos" data-sub="plazos">Plazos de seguridad</a><a href="#cuaderno-fertilizacion" data-sub="fertilizacion">Fertilización</a><a href="#cuaderno-exportar" data-sub="exportar">Exportar</a></nav>
     </div>
@@ -388,7 +456,7 @@ th.mc.cur{color:var(--brand-d)}
   <section class="view" id="v-alertas">
     <div class="phero">
       <a href="#inicio" class="back">← Volver al inicio</a>
-      <div class="phead"><div><h1>🐛 Alertas de plagas y enfermedades</h1><p>Calendario orientativo para la Comunitat Valenciana por cultivo, época y zona, con riesgo según el tiempo.</p></div></div>
+      <div class="phead"><div><h1><span class="phi"><svg class="ic ic-bug" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10a4 4 0 0 1 8 0v4a4 4 0 0 1-8 0z"/><path d="M12 10v8M8 13H4M20 13h-4M8 17l-3 2M16 17l3 2M8.6 8.2L6 6M15.4 8.2L18 6M10 6.3L9 4M14 6.3L15 4"/></svg></span>Alertas de plagas y enfermedades</h1><p>Calendario orientativo para la Comunitat Valenciana por cultivo, época y zona, con riesgo según el tiempo.</p></div></div>
       <nav class="subnav"><a href="#alertas-mes" data-sub="mes">Este mes</a><a href="#alertas-calendario" data-sub="calendario">Calendario anual</a><a href="#alertas-riesgo" data-sub="riesgo">Riesgo meteorológico</a></nav>
     </div>
     <div class="subv" data-subv="mes">
@@ -417,7 +485,7 @@ th.mc.cur{color:var(--brand-d)}
   <section class="view" id="v-ajustes">
     <div class="phero">
       <a href="#inicio" class="back">← Volver al inicio</a>
-      <div class="phead"><div><h1>⚙️ Ajustes</h1><p>Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.</p></div></div>
+      <div class="phead"><div><h1><span class="phi"><svg class="ic ic-sliders" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></span>Ajustes</h1><p>Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.</p></div></div>
       <nav class="subnav"><a href="#ajustes" data-sub="" class="on">General</a></nav>
     </div>
     <div class="grid g2" style="margin-top:16px">
@@ -832,7 +900,10 @@ async function selectStation(code, auto) {
 }
 
 /* ============ meteorología ============ */
-const WMO = c => c === 0 ? ["☀️","Despejado"] : c <= 2 ? ["🌤️","Poco nuboso"] : c === 3 ? ["☁️","Nuboso"] : c <= 48 ? ["🌫️","Niebla"] : c <= 57 ? ["🌦️","Llovizna"] : c <= 67 ? ["🌧️","Lluvia"] : c <= 77 ? ["❄️","Nieve"] : c <= 82 ? ["🌦️","Chubascos"] : ["⛈️","Tormenta"];
+const ICP = {"sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/>", "partly": "<path d=\"M8 2.5v1.5M3.2 4.2l1 1M2 9h1.5M12.8 4.2l-1 1\"/><path d=\"M5.2 11.5A3.5 3.5 0 1 1 11.6 8\"/><path d=\"M9 20h8.5a3.5 3.5 0 0 0 .3-7A5 5 0 0 0 8.3 14 3 3 0 0 0 9 20z\"/>", "cloud": "<path d=\"M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 11 3.5 3.5 0 0 0 7 18z\"/>", "fog": "<path d=\"M7 11h10a4 4 0 0 0-1-7.8A6 6 0 0 0 6 6 3 3 0 0 0 7 11z\"/><path d=\"M3 15h18M5 19h14\"/>", "drizzle": "<path d=\"M7 14h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 7 3.5 3.5 0 0 0 7 14z\"/><path d=\"M8 18v.5M12 19v.5M16 18v.5M10 21.5v.5M14 21.5v.5\"/>", "rain": "<path d=\"M7 14h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 7 3.5 3.5 0 0 0 7 14z\"/><path d=\"M8.5 17l-1.5 4M12.5 17l-1.5 4M16.5 17l-1.5 4\"/>", "snow": "<path d=\"M7 14h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 7 3.5 3.5 0 0 0 7 14z\"/><path d=\"M8 18l1 1M9 18l-1 1M12 20l1 1M13 20l-1 1M16 18l1 1M17 18l-1 1\"/>", "storm": "<path d=\"M7 14h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 7 3.5 3.5 0 0 0 7 14z\"/><path d=\"M12.5 14l-2.5 4h3.5l-2.5 4\"/>", "map": "<path d=\"M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z\"/><path d=\"M9 4v14M15 6v14\"/>", "book": "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 8h6M9 12h6M9 16h3M3 7h3M3 12h3M3 17h3\"/>", "bug": "<path d=\"M8 10a4 4 0 0 1 8 0v4a4 4 0 0 1-8 0z\"/><path d=\"M12 10v8M8 13H4M20 13h-4M8 17l-3 2M16 17l3 2M8.6 8.2L6 6M15.4 8.2L18 6M10 6.3L9 4M14 6.3L15 4\"/>", "sliders": "<path d=\"M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1\"/><circle cx=\"15\" cy=\"6\" r=\"2\"/><circle cx=\"9\" cy=\"12\" r=\"2\"/><circle cx=\"17\" cy=\"18\" r=\"2\"/>", "pin": "<path d=\"M12 21s-6.5-5.8-6.5-11a6.5 6.5 0 0 1 13 0c0 5.2-6.5 11-6.5 11z\"/><circle cx=\"12\" cy=\"10\" r=\"2.3\"/>", "drop": "<path d=\"M12 3s6 6.4 6 10.8A6 6 0 0 1 6 13.8C6 9.4 12 3 12 3z\"/>", "wind": "<path d=\"M3 8h10.5A2.5 2.5 0 1 0 11 5.5M3 12h15.5A2.5 2.5 0 1 1 16 14.5M3 16h8\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v6M12 7.5v.5\"/>", "sprout": "<path d=\"M12 21v-9\"/><path d=\"M12 13C12 8.6 8.9 5.5 4.5 5.5 4.5 9.9 7.6 13 12 13z\"/><path d=\"M12 11c0-3.9 2.7-6.6 6.6-6.6 0 3.9-2.7 6.6-6.6 6.6z\"/>", "thermo": "<path d=\"M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0z\"/><path d=\"M12 9v6\"/>", "spray": "<path d=\"M9 9h6v11a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z\"/><path d=\"M10 9V6h4v3M14 6h3l1-2M18 7l2-1M18 10l2 1M18 8.5h3\"/>", "shield": "<path d=\"M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z\"/><path d=\"M9 12l2 2 4-4\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>"};
+const ico = (n, s = 20, sw = 1.8) => `<svg class="ic ic-${n}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICP[n]}</svg>`;
+
+const WMO = c => { const [n, t] = c === 0 ? ["sun","Despejado"] : c <= 2 ? ["partly","Poco nuboso"] : c === 3 ? ["cloud","Nuboso"] : c <= 48 ? ["fog","Niebla"] : c <= 57 ? ["drizzle","Llovizna"] : c <= 67 ? ["rain","Lluvia"] : c <= 77 ? ["snow","Nieve"] : c <= 82 ? ["drizzle","Chubascos"] : ["storm","Tormenta"]; return [ico(n, 32), t]; };
 async function loadWeather() {
   const { lat, lon } = S.settings;
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
@@ -1017,12 +1088,12 @@ function renderHome() {
   const altos = crops.length ? al.filter(a => { const r = evalRisk(a); return r && r.lvl === "alto"; }).length : 0;
   const wxStat = S.wx ? `${f1(S.wx.current.temperature_2m)} °C ahora · ${S.wx.days[0].win ? `tratar ${pad(S.wx.days[0].win.from)}-${pad(S.wx.days[0].win.to)} h` : "hoy sin ventana"}` : S.station.rows.length ? `${S.station.rows.length} días de estación` : "Importa los datos de tu estación";
   $("#hubTiles").innerHTML = [
-    ["tiempo", "🌤️", "Tiempo y estación", "Predicción a 7 días, horas aptas para tratar y datos de tu estación agroclimática.", wxStat],
-    ["parcelas", "🗺️", "Parcelas SIGPAC", "Mapa con tus recintos, búsqueda por referencia SIGPAC, dibujo e importación.", `${S.parcelas.length} parcelas · ${f2(supTot)} ha`],
-    ["cuaderno", "📒", "Cuaderno", "Aplicaciones de fitosanitarios y fertilizantes, plazos de seguridad y balance de UF.", `${tratAno.length} aplicaciones en ${y}${ps.length ? ` · ${ps.length} plazos en curso` : ""}`],
-    ["alertas", "🐛", "Alertas", "Plagas y enfermedades por cultivo, época y zona, con riesgo según el tiempo.", crops.length ? `${al.length} en ${MESES_L[m - 1]}${altos ? ` · ${altos} con riesgo alto` : ""}` : "Añade parcelas con cultivo"],
-    ["ajustes", "⚙️", "Ajustes", "Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.", esc(S.settings.lugar)]
-  ].map(([h, i, t, d, s]) => `<a class="tile" href="#${h}"><div class="ti">${i}</div><div class="tt">${t}</div><div class="td">${d}</div><div class="ts">${esc(s)}</div><div class="go">Entrar →</div></a>`).join("");
+    ["tiempo", "partly", "Tiempo y estación", "Predicción a 7 días, horas aptas para tratar y datos de tu estación agroclimática.", wxStat],
+    ["parcelas", "map", "Parcelas SIGPAC", "Mapa con tus recintos, búsqueda por referencia SIGPAC, dibujo e importación.", `${S.parcelas.length} parcelas · ${f2(supTot)} ha`],
+    ["cuaderno", "book", "Cuaderno", "Aplicaciones de fitosanitarios y fertilizantes, plazos de seguridad y balance de UF.", `${tratAno.length} aplicaciones en ${y}${ps.length ? ` · ${ps.length} plazos en curso` : ""}`],
+    ["alertas", "bug", "Alertas", "Plagas y enfermedades por cultivo, época y zona, con riesgo según el tiempo.", crops.length ? `${al.length} en ${MESES_L[m - 1]}${altos ? ` · ${altos} con riesgo alto` : ""}` : "Añade parcelas con cultivo"],
+    ["ajustes", "sliders", "Ajustes", "Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.", esc(S.settings.lugar)]
+  ].map(([h, i, t, d, s]) => `<a class="tile t-${h}" href="#${h}"><div class="ti">${ico(i, 26)}</div><div class="tt">${t}</div><div class="td">${d}</div><div class="ts">${esc(s)}</div><div class="go">Entrar →</div></a>`).join("");
 
   // tiempo
   if (S.wx) {
@@ -1057,7 +1128,7 @@ function renderTiempo() {
       <p class="small muted" style="margin:10px 0 0">${esc(S.settings.lugar)} (${S.settings.lat.toFixed(3)}, ${S.settings.lon.toFixed(3)}) · actualizado a las ${S.wx.at.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</p>`;
     $("#wxDays").innerHTML = `<div class="days">${S.wx.days.map(d => { const [i] = WMO(d.code); const dt = new Date(d.date + "T12:00:00");
       return `<div class="day"><div class="d">${DIAS[dt.getDay()]} ${dt.getDate()}</div><div class="ic">${i}</div><div class="tt">${f1(d.tmax)}° / ${f1(d.tmin)}°</div>
-      <div class="muted">💧 ${f1(d.precip)} mm${d.pprob !== null ? ` · ${d.pprob}%` : ""}</div><div class="muted">💨 ${f1(d.vmax)} km/h</div><div class="muted">ETo ${f1(d.eto)} mm</div>
+      <div class="muted">${ico("drop",14)} ${f1(d.precip)} mm${d.pprob !== null ? ` · ${d.pprob}%` : ""}</div><div class="muted">${ico("wind",14)} ${f1(d.vmax)} km/h</div><div class="muted">ETo ${f1(d.eto)} mm</div>
       ${d.win ? `<div class="win ok">Tratar ${pad(d.win.from)}-${pad(d.win.to)} h</div>` : `<div class="win no">No tratar</div>`}</div>`; }).join("")}</div>`;
   } else {
     const msg = S.online === false ? `La predicción en vivo necesita conexión con Open-Meteo, que no está disponible en esta vista. Funciona al alojar la página en una web propia. Mientras tanto puedes importar los datos de tu estación aquí abajo.` : "Cargando predicción…";
@@ -1541,7 +1612,7 @@ $("#stFile").addEventListener("change", async e => {
 $("#geoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; e.target.value = ""; await importGeoFile(f); });
 
 function renderOfflineBanner() {
-  $("#offlineBanner").innerHTML = S.online === false ? `<div class="banner info"><span>ℹ️</span><span>Estás en modo sin conexión: la predicción en vivo, la búsqueda de recintos y las capas del mapa necesitan acceso a Open-Meteo, FEGA e IGN. Tus parcelas, el cuaderno, las alertas y la importación de datos de estación funcionan con normalidad.</span></div>` : "";
+  $("#offlineBanner").innerHTML = S.online === false ? `<div class="banner info">${ico("info",18)}<span>Estás en modo sin conexión: la predicción en vivo, la búsqueda de recintos y las capas del mapa necesitan acceso a Open-Meteo, FEGA e IGN. Tus parcelas, el cuaderno, las alertas y la importación de datos de estación funcionan con normalidad.</span></div>` : "";
 }
 
 /* ============ arranque ============ */
