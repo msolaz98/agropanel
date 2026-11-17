@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgroPanel · Panel del técnico agrícola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5ef;--card:#fff;--ink:#1e2a1b;--muted:#646f5d;--line:#e0e5d9;
+  --brand:#2f6b3a;--brand-d:#24552d;--brand-l:#e8f1e5;
+  --warn:#9a6312;--warnbg:#fdf2dd;--bad:#a8362a;--badbg:#fbe7e3;
+  --ok:#2c7246;--okbg:#e4f3e8;--info:#2b5c86;--infobg:#e6eff8;
+  --r:12px;--sh:0 1px 2px rgba(30,42,27,.06),0 2px 8px rgba(30,42,27,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--brand)}
+h1,h2,h3{margin:0;line-height:1.2}
+h2{font-size:20px}
+h3{font-size:15px}
+.app{max-width:1200px;margin:0 auto;padding:0 16px 48px}
+header.top{position:sticky;top:0;z-index:1500;background:var(--brand);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.topin{max-width:1200px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.logo svg{flex:none}
+.logo small{display:block;font-weight:500;font-size:11px;opacity:.8;letter-spacing:0}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+nav.tabs a{color:#fff;text-decoration:none;padding:7px 12px;border-radius:8px;font-weight:500;font-size:14px;opacity:.88}
+nav.tabs a:hover{background:rgba(255,255,255,.12);opacity:1}
+nav.tabs a.on{background:#fff;color:var(--brand-d);opacity:1}
+.loc-pill{font:inherit;font-size:13px;color:#fff;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);padding:5px 12px;border-radius:99px;white-space:nowrap;cursor:pointer}
+.loc-pill:hover{background:rgba(255,255,255,.25)}
+.locwrap{position:relative}
+.locpop{position:absolute;top:calc(100% + 8px);left:0;width:340px;max-width:calc(100vw - 32px);background:#fff;color:var(--ink);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:14px;z-index:2000}
+.locres{margin-top:8px;max-height:300px;overflow:auto}
+.locres button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.locres button:hover{background:var(--brand-l)}
+.locres small{color:var(--muted);display:block;font-size:12px}
+.locres .grp{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:8px 10px 2px}
+.ststatus{font-size:13px;padding:8px 12px;border-radius:8px;margin-bottom:12px}
+.ststatus.ok{background:var(--okbg);color:var(--ok)}.ststatus.err{background:var(--warnbg);color:var(--warn)}.ststatus.load{background:var(--infobg);color:var(--info)}
+.banner{margin:16px 0 0;padding:10px 14px;border-radius:10px;font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.banner.info{background:var(--infobg);color:var(--info)}
+.banner.warn{background:var(--warnbg);color:var(--warn)}
+.view{display:none;padding-top:18px}
+.view.on{display:block}
+.vhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.vhead p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:16px}
+.card h3{margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.kpi .v{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.kpi .l{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.kpi .s{font-size:13px;color:var(--muted);margin-top:2px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:8px 13px;border-radius:9px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:#c5ccbb;background:#fafbf8}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand-d)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:5px 9px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500;color:var(--muted)}
+input,select,textarea{font:inherit;font-size:14px;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #b9d4b3;border-color:var(--brand)}
+textarea{min-height:70px;resize:vertical}
+.fgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.fgrid .w2{grid-column:span 2}
+.badge{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--brand-l);color:var(--brand-d);white-space:nowrap}
+.badge.alto{background:var(--badbg);color:var(--bad)}
+.badge.medio{background:var(--warnbg);color:var(--warn)}
+.badge.bajo{background:var(--okbg);color:var(--ok)}
+.badge.gris{background:#eef0ea;color:var(--muted)}
+.badge.fito{background:#efe8f7;color:#5b3a86}
+.badge.ferti{background:var(--infobg);color:var(--info)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;background:#fafbf8;position:sticky;top:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:10px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+/* weather */
+.wx-now{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.wx-now .ic{font-size:44px;line-height:1}
+.wx-now .t{font-size:40px;font-weight:700;letter-spacing:-.03em}
+.days{display:grid;grid-template-columns:repeat(7,minmax(92px,1fr));gap:8px;overflow:auto}
+.day{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;background:#fff;font-size:13px}
+.day .d{font-weight:600}
+.day .ic{font-size:24px;margin:4px 0}
+.day .tt{font-weight:600}
+.day .win{margin-top:6px;font-size:11.5px;padding:3px 4px;border-radius:6px}
+.win.ok{background:var(--okbg);color:var(--ok)}
+.win.no{background:var(--badbg);color:var(--bad)}
+.chart svg{width:100%;height:auto;display:block}
+/* map */
+#map{height:520px;border-radius:var(--r);border:1px solid var(--line);background:#e9ede3}
+.maptools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.plist{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow:auto}
+.pitem{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;cursor:pointer}
+.pitem:hover{border-color:#bccab3}
+.pitem.sel{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-l)}
+.pitem .n{font-weight:600}
+.pitem .m{font-size:12.5px;color:var(--muted)}
+/* alerts */
+.al{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.al .hd{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.al .nm{font-weight:600}
+.al .sci{font-style:italic;color:var(--muted);font-size:12.5px}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin:4px 0}
+.months span{font-size:10px;text-align:center;padding:2px 0;border-radius:3px;background:#eef0ea;color:#9aa293}
+.months span.on{background:#cfe3c9;color:var(--brand-d);font-weight:600}
+.months span.now{outline:2px solid var(--brand)}
+.al .why{font-size:12.5px;color:var(--muted)}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(20,28,18,.45);z-index:3000;display:none;align-items:flex-start;justify-content:center;padding:40px 12px;overflow:auto}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;padding:20px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal h2{margin-bottom:12px}
+.modal .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.sec-t{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin:14px 0 8px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#1e2a1b;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:4000;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw}
+#toast.on{opacity:1}
+.loading{padding:60px;text-align:center;color:var(--muted)}
+.list-plain{margin:0;padding-left:18px}
+.list-plain li{margin:3px 0}
+.foot{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:640px){
+  #map{height:400px}
+  nav.tabs{margin-left:0;width:100%;overflow:auto;flex-wrap:nowrap}
+  .fgrid .w2{grid-column:span 1}
+}
+
+/* --- portal y páginas de sección --- */
+.hub-hero{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:6px 0 16px}
+.hub-hero h1{font-size:26px;letter-spacing:-.02em}
+.hub-hero p{margin:4px 0 0;color:var(--muted)}
+.hub-sub{margin:26px 0 12px;font-size:18px}
+.tiles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.tile{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:var(--ink);box-shadow:var(--sh);transition:transform .12s,box-shadow .12s,border-color .12s;min-height:190px}
+.tile:hover{transform:translateY(-2px);border-color:var(--brand);box-shadow:0 8px 20px rgba(30,42,27,.1)}
+.tile .ti{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:23px;background:var(--brand-l)}
+.tile .tt{font-weight:700;font-size:17px}
+.tile .td{font-size:13px;color:var(--muted);flex:1}
+.tile .ts{font-size:13.5px;font-weight:600;color:var(--brand-d)}
+.tile .go{font-size:13px;color:var(--brand);font-weight:600}
+.phero{background:linear-gradient(135deg,#2f6b3a,#447f45);color:#fff;border-radius:16px;padding:16px 22px 0;margin-top:6px}
+.phero .back{color:#fff;opacity:.85;text-decoration:none;font-size:13px;font-weight:500}
+.phero .back:hover{opacity:1;text-decoration:underline}
+.phead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.phero h1{font-size:25px;margin:8px 0 4px;letter-spacing:-.02em}
+.phero p{margin:0 0 14px;opacity:.9;max-width:760px;font-size:14.5px}
+.phead .btn{margin-bottom:14px}
+.subnav{display:flex;gap:4px;overflow:auto;margin-top:4px}
+.subnav a{color:#fff;text-decoration:none;padding:9px 15px;border-radius:10px 10px 0 0;font-weight:500;font-size:14px;opacity:.85;white-space:nowrap}
+.subnav a:hover{opacity:1;background:rgba(255,255,255,.1)}
+.subnav a.on{background:var(--bg);color:var(--brand-d);opacity:1;font-weight:600}
+.subv{display:none;padding-top:16px}
+.subv.on{display:block}
+.hourgrid{display:grid;grid-template-columns:96px repeat(16,minmax(18px,1fr));gap:3px;font-size:11.5px;align-items:center;overflow:auto}
+.hourgrid .hc{height:24px;border-radius:4px}
+.hc.g{background:#86c796}.hc.b{background:#f2b6ab}.hc.n{background:#eceee8}
+.hourgrid .hh{text-align:center;color:var(--muted)}
+.hourgrid .dl{font-weight:600;font-size:12.5px}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+td.mc{text-align:center;padding:6px 2px;width:6.5%}
+td.mc span{display:block;height:18px;border-radius:4px;background:#eef0ea}
+td.mc span.on{background:#a9d29f}
+td.mc span.on.cur{background:var(--brand)}
+th.mc{text-align:center;padding:6px 2px}
+th.mc.cur{color:var(--brand-d)}
+.progress{height:6px;background:#eef0ea;border-radius:9px;overflow:hidden;margin-top:4px}
+.progress b{display:block;height:100%;background:var(--bad)}
+/* --- Leaflet esencial (inlined) --- */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent;font:13px/1.4 Inter,system-ui,sans-serif;outline-offset:1px}
+.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{user-select:none;-webkit-user-drag:none}
+.leaflet-container img.leaflet-tile{max-width:none!important;max-height:none!important;width:256px;height:256px}
+.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}
+.leaflet-tile{filter:inherit;visibility:hidden}
+.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800}
+.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{transition:none}
+.leaflet-interactive{cursor:pointer}
+.leaflet-grab{cursor:grab}.leaflet-dragging .leaflet-grab{cursor:move}
+.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}
+.leaflet-pane>svg path{pointer-events:none}
+.leaflet-pane>svg path.leaflet-interactive{pointer-events:visiblePainted;pointer-events:auto}
+.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto;float:left;clear:both}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-right .leaflet-control{float:right;margin-right:10px}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}
+.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}
+.leaflet-bar a{background:#fff;border-bottom:1px solid #ccc;width:30px;height:30px;line-height:30px;display:block;text-align:center;text-decoration:none;color:#000;font:bold 18px 'Lucida Console',Monaco,monospace}
+.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}
+.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}
+.leaflet-bar a.leaflet-disabled{cursor:default;background:#f4f4f4;color:#bbb}
+.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}
+.leaflet-control-layers-toggle{display:block;width:auto;height:auto;padding:6px 10px;text-decoration:none;color:#222;font-weight:600;font-size:12px}
+.leaflet-control-layers-toggle::after{content:"Capas"}
+.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}
+.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}
+.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333}
+.leaflet-control-layers label{display:block;font-size:13px}
+.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}
+.leaflet-container .leaflet-control-attribution{background:rgba(255,255,255,.8);margin:0;font-size:10.5px;padding:0 5px;color:#333}
+.leaflet-control-attribution a{text-decoration:none}
+.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;box-sizing:border-box;background:rgba(255,255,255,.8)}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:10px;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.leaflet-popup-content{margin:12px 16px;line-height:1.4;font-size:13px;min-height:1px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:transparent}
+.leaflet-tooltip{position:absolute;padding:4px 6px;background:#fff;border-radius:4px;color:#222;white-space:nowrap;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4);font-size:12px}
+.leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{position:absolute;pointer-events:none;border:6px solid transparent;background:transparent;content:""}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#fff" opacity=".15"/><path d="M16 26V12M16 17c-4 0-7-3-7-7 4 0 7 3 7 7zm0-2c0-4 3-7 7-7 0 4-3 7-7 7z" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>AgroPanel<small>Panel del técnico agrícola</small></div>
+    </div>
+    <div class="locwrap">
+      <button class="loc-pill" id="locBtn" data-act="toggleLoc" title="Cambiar ubicación">📍 <span id="locTxt">—</span> ▾</button>
+      <div class="locpop" id="locPop" hidden>
+        <button class="btn pri" data-act="geoMe" style="width:100%;justify-content:center">📍 Usar mi ubicación actual</button>
+        <div id="geoMsg" class="small muted" style="margin:6px 0 10px"></div>
+        <input id="locQ" placeholder="Buscar municipio o provincia (p. ej. Castellón)" autocomplete="off" style="width:100%">
+        <div id="locRes" class="locres"></div>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <a href="#inicio" data-v="inicio">Inicio</a>
+      <a href="#tiempo" data-v="tiempo">Tiempo y estación</a>
+      <a href="#parcelas" data-v="parcelas">Parcelas SIGPAC</a>
+      <a href="#cuaderno" data-v="cuaderno">Cuaderno</a>
+      <a href="#alertas" data-v="alertas">Alertas</a>
+      <a href="#ajustes" data-v="ajustes">Ajustes</a>
+    </nav>
+  </div>
+</header>
+
+<div class="app">
+  <div id="offlineBanner"></div>
+  <div id="boot" class="loading">Cargando tus datos…</div>
+
+  <!-- ================= INICIO (portal) ================= -->
+  <section class="view" id="v-inicio">
+    <div class="hub-hero">
+      <div><h1>Panel del técnico agrícola</h1><p id="hoyTxt"></p></div>
+      <button class="btn pri" data-act="nuevoTrat">+ Registrar aplicación</button>
+    </div>
+    <div class="tiles" id="hubTiles"></div>
+    <h2 class="hub-sub">Hoy en tu zona</h2>
+    <div class="grid g2">
+      <div class="card"><h3>Tiempo y ventana de tratamiento</h3><div id="homeWx"></div></div>
+      <div class="card"><h3>Alertas activas en tus cultivos</h3><div id="homeAlerts"></div></div>
+      <div class="card"><h3>Plazos de seguridad en curso</h3><div id="homePS"></div></div>
+      <div class="card"><h3>Últimas aplicaciones</h3><div id="homeLast"></div></div>
+    </div>
+  </section>
+
+  <!-- ================= TIEMPO ================= -->
+  <section class="view" id="v-tiempo">
+    <div class="phero">
+      <a href="#inicio" class="back">← Volver al inicio</a>
+      <div class="phead"><div><h1>🌤️ Tiempo y estación</h1><p>Predicción de tu zona, horas aptas para tratar y datos reales de tu estación agroclimática.</p></div>
+        <button class="btn" data-act="recargarWx">Actualizar predicción</button></div>
+      <nav class="subnav"><a href="#tiempo-prediccion" data-sub="prediccion">Predicción</a><a href="#tiempo-ventanas" data-sub="ventanas">Ventanas de tratamiento</a><a href="#tiempo-estacion" data-sub="estacion">Estación agroclimática</a></nav>
+    </div>
+    <div class="subv" data-subv="prediccion">
+      <div class="grid g2">
+        <div class="card"><h3>Ahora</h3><div id="wxNow"></div></div>
+        <div class="card"><h3>Resumen de la semana</h3><div id="wxWeek" class="small"></div></div>
+      </div>
+      <div class="card" style="margin-top:14px"><h3>Próximos 7 días</h3><div id="wxDays"></div></div>
+    </div>
+    <div class="subv" data-subv="ventanas">
+      <div class="card"><h3>Horas aptas para tratar (6 a 21 h)</h3><div id="wxWin"></div></div>
+      <div class="card" style="margin-top:14px"><h3>Criterios</h3><div id="wxRules" class="small"></div></div>
+    </div>
+    <div class="subv" data-subv="estacion">
+      <div class="card">
+        <div class="vhead" style="margin-bottom:10px"><div style="flex:1;min-width:260px"><h3 style="margin:0 0 8px">Estación agroclimática (red SiAR · Comunitat Valenciana)</h3>
+          <select id="stSel" style="width:100%;max-width:520px"></select>
+          <p id="stNear" class="small muted" style="margin:6px 0 0"></p></div>
+          <div class="row">
+            <button class="btn" data-act="syncStation">Actualizar ahora</button>
+            <label class="btn">Importar CSV<input type="file" id="stFile" accept=".csv,.txt,.json" hidden></label>
+            <a class="btn" href="https://servicio.mapa.gob.es/siarweb/consultaDatos/inicio" target="_blank" rel="noopener">Consulta SiAR ↗</a>
+          </div></div>
+        <div id="stStatus"></div>
+        <p id="stName" class="small muted" style="margin:0 0 10px"></p>
+        <div id="stBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PARCELAS ================= -->
+  <section class="view" id="v-parcelas">
+    <div class="phero">
+      <a href="#inicio" class="back">← Volver al inicio</a>
+      <div class="phead"><div><h1>🗺️ Parcelas y recintos SIGPAC</h1><p>Localiza tus recintos, dibújalos o impórtalos, y asígnales cultivo y comarca.</p></div>
+        <button class="btn" data-act="nuevaParcSinMapa">+ Parcela sin mapa</button></div>
+      <nav class="subnav"><a href="#parcelas-mapa" data-sub="mapa">Mapa</a><a href="#parcelas-listado" data-sub="listado">Listado y superficies</a></nav>
+    </div>
+    <div class="subv" data-subv="mapa">
+      <div class="maptools">
+        <button class="btn pri" data-act="buscarSigpac">Buscar recinto SIGPAC</button>
+        <button class="btn" data-act="dibujar" id="btnDraw">Dibujar parcela</button>
+        <button class="btn" data-act="terminarDibujo" id="btnEnd" hidden>Terminar dibujo</button>
+        <button class="btn danger" data-act="cancelarDibujo" id="btnCancel" hidden>Cancelar</button>
+        <label class="btn">Importar GeoJSON / KML<input type="file" id="geoFile" accept=".geojson,.json,.kml" hidden></label>
+        <a class="btn" href="https://sigpac.mapa.gob.es/fega/visor/" target="_blank" rel="noopener">Visor SIGPAC oficial ↗</a>
+      </div>
+      <div id="mapNote"></div>
+      <div class="grid" style="grid-template-columns:minmax(0,2.2fr) minmax(260px,1fr)">
+        <div id="map"></div>
+        <div class="card" style="padding:12px"><h3>Mis parcelas <span class="badge gris" id="pCount">0</span></h3><div class="plist" id="plist"></div></div>
+      </div>
+    </div>
+    <div class="subv" data-subv="listado">
+      <div class="grid g4" id="parcKpis" style="margin-bottom:14px"></div>
+      <div class="tablewrap" id="parcTable"></div>
+    </div>
+  </section>
+
+  <!-- ================= CUADERNO ================= -->
+  <section class="view" id="v-cuaderno">
+    <div class="phero">
+      <a href="#inicio" class="back">← Volver al inicio</a>
+      <div class="phead"><div><h1>📒 Cuaderno de aplicaciones</h1><p>Registro de fitosanitarios y fertilizantes por parcela, plazos de seguridad, balance de unidades fertilizantes y exportación.</p></div>
+        <button class="btn pri" data-act="nuevoTrat">+ Nueva aplicación</button></div>
+      <nav class="subnav"><a href="#cuaderno-registro" data-sub="registro">Registro</a><a href="#cuaderno-plazos" data-sub="plazos">Plazos de seguridad</a><a href="#cuaderno-fertilizacion" data-sub="fertilizacion">Fertilización</a><a href="#cuaderno-exportar" data-sub="exportar">Exportar</a></nav>
+    </div>
+    <div class="subv" data-subv="registro">
+      <div class="card" style="margin-bottom:14px">
+        <div class="row">
+          <label class="f">Año<select id="fAno"></select></label>
+          <label class="f">Parcela<select id="fParc"></select></label>
+          <label class="f">Tipo<select id="fTipo"><option value="">Todos</option><option value="fito">Fitosanitario</option><option value="ferti">Fertilizante</option></select></label>
+          <label class="f" style="flex:1;min-width:180px">Buscar<input id="fTxt" placeholder="Producto, materia activa, plaga…"></label>
+        </div>
+      </div>
+      <div class="tablewrap" id="tratTable"></div>
+    </div>
+    <div class="subv" data-subv="plazos">
+      <div class="grid g2">
+        <div class="card"><h3>En curso: no cosechar</h3><div id="psActivos"></div></div>
+        <div class="card"><h3>Cumplidos en los últimos 30 días</h3><div id="psCumplidos"></div></div>
+      </div>
+    </div>
+    <div class="subv" data-subv="fertilizacion">
+      <div class="card" style="margin-bottom:14px"><div class="row"><label class="f">Año<select id="bAno"></select></label></div></div>
+      <div class="card"><h3>Balance por parcela</h3><div id="balance"></div></div>
+    </div>
+    <div class="subv" data-subv="exportar">
+      <div class="grid g2">
+        <div class="card"><h3>Exportar el cuaderno a CSV</h3>
+          <p class="small muted" style="margin-top:0">Se abre en Excel, LibreOffice u Hojas de cálculo de Google (separador punto y coma). Incluye referencia SIGPAC, producto, nº de registro, materia activa, dosis, plazo de seguridad, aplicador, ROPO, equipo y unidades fertilizantes.</p>
+          <div class="row" style="margin-bottom:10px"><label class="f">Año<select id="eAno"></select></label><label class="f">Tipo<select id="eTipo"><option value="">Todos</option><option value="fito">Fitosanitarios</option><option value="ferti">Fertilizantes</option></select></label></div>
+          <p class="small" id="eCount"></p>
+          <div class="row"><button class="btn pri" data-act="copiarCSV">Copiar CSV</button><button class="btn" data-act="descargarCSV">Descargar CSV</button></div>
+        </div>
+        <div class="card"><h3>Copia de seguridad completa</h3>
+          <p class="small muted" style="margin-top:0">Parcelas, cuaderno, ajustes y datos de estación en un único archivo JSON, para guardarlo o pasarlo a otro dispositivo.</p>
+          <div class="row"><button class="btn" data-act="copiarBackup">Copiar copia (JSON)</button><button class="btn" data-act="descargarBackup">Descargar</button><a class="btn" href="#ajustes">Restaurar…</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ALERTAS ================= -->
+  <section class="view" id="v-alertas">
+    <div class="phero">
+      <a href="#inicio" class="back">← Volver al inicio</a>
+      <div class="phead"><div><h1>🐛 Alertas de plagas y enfermedades</h1><p>Calendario orientativo para la Comunitat Valenciana por cultivo, época y zona, con riesgo según el tiempo.</p></div></div>
+      <nav class="subnav"><a href="#alertas-mes" data-sub="mes">Este mes</a><a href="#alertas-calendario" data-sub="calendario">Calendario anual</a><a href="#alertas-riesgo" data-sub="riesgo">Riesgo meteorológico</a></nav>
+    </div>
+    <div class="subv" data-subv="mes">
+      <div class="card" style="margin-bottom:14px">
+        <div class="row">
+          <label class="f">Cultivo<select id="aCult"></select></label>
+          <label class="f">Mes<select id="aMes"></select></label>
+          <label class="f">Provincia<select id="aProv"></select></label>
+          <label class="f">Mostrar<select id="aSolo"><option value="mes">Solo las del mes</option><option value="todas">Todo el año</option></select></label>
+        </div>
+      </div>
+      <div class="grid g3" id="alList"></div>
+    </div>
+    <div class="subv" data-subv="calendario">
+      <div class="card" style="margin-bottom:14px"><div class="row"><label class="f">Cultivo<select id="cCult"></select></label></div></div>
+      <div class="tablewrap" id="alCal" style="max-height:none"></div>
+    </div>
+    <div class="subv" data-subv="riesgo">
+      <div class="card"><h3>Riesgo calculado para este mes</h3><div id="alRisk"></div></div>
+      <div class="card" style="margin-top:14px"><h3>Reglas que usa el panel</h3><div id="alRules" class="small"></div></div>
+    </div>
+    <p class="small muted" style="margin:14px 0 0">Orientativo: confirma siempre con el <a href="http://www.agroambient.gva.es/boletin-de-avisos" target="_blank" rel="noopener">Butlletí d'Avisos de Sanidad Vegetal (GVA)</a> y usa solo productos del <a href="https://www.mapa.gob.es/es/agricultura/temas/sanidad-vegetal/productos-fitosanitarios/registro-productos/" target="_blank" rel="noopener">Registro de productos fitosanitarios (MAPA)</a>.</p>
+  </section>
+
+  <!-- ================= AJUSTES ================= -->
+  <section class="view" id="v-ajustes">
+    <div class="phero">
+      <a href="#inicio" class="back">← Volver al inicio</a>
+      <div class="phead"><div><h1>⚙️ Ajustes</h1><p>Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.</p></div></div>
+      <nav class="subnav"><a href="#ajustes" data-sub="" class="on">General</a></nav>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h3>Ubicación de trabajo</h3>
+        <div class="row" style="margin-bottom:10px"><input id="geoQ" placeholder="Municipio (p. ej. Sueca)" style="flex:1"><button class="btn" data-act="geoBuscar">Buscar</button></div>
+        <div id="geoRes" class="small"></div>
+        <div class="fgrid">
+          <label class="f">Nombre<input id="sLugar"></label>
+          <label class="f">Latitud<input id="sLat" type="number" step="0.0001"></label>
+          <label class="f">Longitud<input id="sLon" type="number" step="0.0001"></label>
+          <label class="f">Provincia<select id="sProv"></select></label>
+          <label class="f">Comarca<select id="sCom"></select></label>
+        </div>
+        <label class="row small" style="margin-top:10px"><input type="checkbox" id="sGeoAuto"> Detectar mi ubicación al abrir la página</label>
+        <div class="row" style="margin-top:12px"><button class="btn pri" data-act="guardarUbic">Guardar ubicación</button></div>
+      </div>
+      <div class="card"><h3>Estación agroclimática</h3>
+        <p class="small muted" style="margin-top:0">Cada vez que abres o recargas la página se descargan los datos de la estación seleccionada desde esta dirección. <b>{codigo}</b> se sustituye por el código SiAR (p. ej. V14). Con el script diario incluido, deja el valor por defecto.</p>
+        <div class="fgrid">
+          <label class="f w2">Plantilla de URL de datos (CSV/JSON)<input id="sStUrl" placeholder="datos/{codigo}.json"></label>
+        </div>
+        <label class="row small" style="margin-top:10px"><input type="checkbox" id="sStAuto"> Elegir automáticamente la estación más cercana al cambiar de ubicación</label>
+        <p class="small muted">Columnas reconocidas: fecha, tmax, tmin, tmed (o temperatura), humedad/HR, precipitación/lluvia, ETo (EtPMon), viento. Separador ; o , y decimales con coma o punto. También el JSON de la API SiAR.</p>
+        <div class="row"><button class="btn pri" data-act="guardarEst">Guardar</button></div>
+      </div>
+      <div class="card"><h3>Servicios SIGPAC</h3>
+        <div class="fgrid">
+          <label class="f w2">URL del WMS de recintos<input id="sWms"></label>
+          <label class="f">Capa WMS<input id="sWmsLayer"></label>
+          <label class="f w2">Consulta de recinto (GeoJSON)<input id="sRecinfo"></label>
+        </div>
+        <p class="small muted">Marcadores: {prov} {mun} {agr} {zona} {pol} {par} {rec}. Si el FEGA cambia sus servicios, actualiza aquí la dirección o el nombre de la capa (lo encontrarás en el GetCapabilities del WMS).</p>
+        <div class="row"><button class="btn pri" data-act="guardarSig">Guardar</button><button class="btn" data-act="resetSig">Valores por defecto</button></div>
+      </div>
+      <div class="card"><h3>Datos y copia de seguridad</h3>
+        <p class="small" id="storeInfo"></p>
+        <div class="row"><button class="btn" data-act="copiarBackup">Copiar copia de seguridad (JSON)</button><button class="btn" data-act="descargarBackup">Descargar</button></div>
+        <label class="f" style="margin-top:12px">Restaurar desde JSON<textarea id="restoreTxt" placeholder="Pega aquí una copia de seguridad"></textarea></label>
+        <div class="row" style="margin-top:8px"><button class="btn" data-act="restaurar">Restaurar (añade a lo existente)</button></div>
+      </div>
+    </div>
+  </section>
+
+<p class="foot">AgroPanel · Datos meteorológicos: Open-Meteo y tu estación · Cartografía: FEGA (SIGPAC) e IGN (PNOA) · Las alertas son orientativas y no sustituyen a los avisos oficiales ni a la etiqueta del producto.</p>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+"use strict";
+/* ============ utilidades ============ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const num = v => { if (v === null || v === undefined || v === "") return null; const n = typeof v === "number" ? v : parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : null; };
+const f1 = v => v === null || v === undefined || !isFinite(v) ? "—" : (Math.round(v * 10) / 10).toLocaleString("es-ES");
+const f2 = v => v === null || v === undefined || !isFinite(v) ? "—" : (Math.round(v * 100) / 100).toLocaleString("es-ES");
+const pad = n => String(n).padStart(2, "0");
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const today = () => isoDate(new Date());
+const addDays = (iso, n) => { const d = new Date(iso + "T12:00:00"); d.setDate(d.getDate() + n); return isoDate(d); };
+const fDate = iso => { if (!iso) return "—"; const [y, m, d] = iso.split("-"); return `${d}/${m}/${y}`; };
+const MESES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const MESES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIAS = ["dom","lun","mar","mié","jue","vie","sáb"];
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), 2600); }
+async function fetchWithTimeout(url, ms = 9000) {
+  const c = new AbortController(); const t = setTimeout(() => c.abort(), ms);
+  try { const r = await fetch(url, { signal: c.signal }); if (!r.ok) throw new Error("HTTP " + r.status); return r; }
+  finally { clearTimeout(t); }
+}
+function norm(s) { return String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, ""); }
+
+/* ============ datos de referencia ============ */
+const CULTIVOS = ["Cítricos","Arroz","Vid","Caqui","Olivo","Almendro","Frutales de hueso","Hortícolas (tomate)","Otro"];
+const COMARCAS = {
+  "Castellón": ["Els Ports","Baix Maestrat","Alt Maestrat","L'Alcalatén","Plana Alta","Plana Baixa","Alt Millars","Alt Palància"],
+  "Valencia": ["Racó d'Ademús","Los Serranos","Camp de Túria","Camp de Morvedre","L'Horta Nord","València","L'Horta Oest","L'Horta Sud","Requena-Utiel","Hoya de Buñol","Valle de Cofrentes-Ayora","Ribera Alta","Ribera Baixa","Canal de Navarrés","La Costera","La Vall d'Albaida","La Safor"],
+  "Alicante": ["Marina Alta","Marina Baixa","El Comtat","L'Alcoià","Alt Vinalopó","Vinalopó Mitjà","L'Alacantí","Baix Vinalopó","Vega Baja"]
+};
+const PROVINCIAS = Object.keys(COMARCAS);
+const LINK_BOLETIN = "http://www.agroambient.gva.es/boletin-de-avisos";
+const LINK_GIPCAQUI = "http://gipcaqui.ivia.es/area/enfermedades/enfermedades-foliares";
+const LINK_SIAR = "https://servicio.mapa.gob.es/siarweb/consultaDatos/inicio";
+
+/* Estaciones activas de la red SiAR en la Comunitat Valenciana (códigos y nombres según la consulta de datos del SiAR).
+   Coordenadas aproximadas del municipio, solo para proponer la estación más cercana. */
+const ESTACIONES = [
+  ["A02","Camp de Mirra","Alicante","Alt Vinalopó",38.682,-0.774],
+  ["A03","Vila Joiosa","Alicante","Marina Baixa",38.508,-0.233],
+  ["A04","Ondara","Alicante","Marina Alta",38.822,0.017],
+  ["A05","Dénia Gata","Alicante","Marina Alta",38.774,0.085],
+  ["A06","Pinoso","Alicante","Vinalopó Mitjà",38.402,-1.042],
+  ["A08","Monforte del Cid","Alicante","Vinalopó Mitjà",38.380,-0.729],
+  ["A09","Crevillente","Alicante","Baix Vinalopó",38.249,-0.809],
+  ["A10","Almoradí","Alicante","Vega Baja",38.110,-0.790],
+  ["A13","Catral","Alicante","Vega Baja",38.160,-0.804],
+  ["A15","Altea","Alicante","Marina Baixa",38.599,-0.051],
+  ["A18","Planes","Alicante","El Comtat",38.786,-0.344],
+  ["A19","Villena","Alicante","Alt Vinalopó",38.635,-0.866],
+  ["A20","Agost","Alicante","L'Alacantí",38.441,-0.637],
+  ["A21","Orihuela - La Murada","Alicante","Vega Baja",38.188,-0.958],
+  ["A101","Elx EEA","Alicante","Baix Vinalopó",38.267,-0.698],
+  ["A102","Callosa d'en Sarrià","Alicante","Marina Baixa",38.651,-0.122],
+  ["A1020","Callosa d'en Sarrià (malla)","Alicante","Marina Baixa",38.651,-0.121],
+  ["CS01","Vall d'Uixó","Castellón","Plana Baixa",39.823,-0.233],
+  ["CS03","San Rafael del Río","Castellón","Baix Maestrat",40.598,0.363],
+  ["CS05","Castelló Benadresa","Castellón","Plana Alta",40.010,-0.090],
+  ["CS07","Ribera de Cabanes","Castellón","Plana Alta",40.130,0.040],
+  ["CS08","Nules","Castellón","Plana Baixa",39.853,-0.156],
+  ["CS09","Segorbe","Castellón","Alt Palància",39.851,-0.488],
+  ["CS11","Onda","Castellón","Plana Baixa",39.963,-0.262],
+  ["CS13","Vila-real","Castellón","Plana Baixa",39.938,-0.101],
+  ["CS101","Vila-real EEA","Castellón","Plana Baixa",39.950,-0.095],
+  ["V01","Pedralba","Valencia","Camp de Túria",39.603,-0.723],
+  ["V02","Llíria","Valencia","Camp de Túria",39.625,-0.596],
+  ["V04","Benifaió","Valencia","Ribera Alta",39.285,-0.426],
+  ["V05","Cheste","Valencia","Hoya de Buñol",39.493,-0.684],
+  ["V06","Tavernes de la Valldigna","Valencia","La Safor",39.072,-0.267],
+  ["V07","Castelló (de la Ribera)","Valencia","Ribera Alta",39.083,-0.510],
+  ["V10","Benavites","Valencia","Camp de Morvedre",39.734,-0.237],
+  ["V14","Algemesí","Valencia","Ribera Alta",39.190,-0.436],
+  ["V17","Picassent","Valencia","L'Horta Sud",39.362,-0.459],
+  ["V18","Montesa","Valencia","La Costera",38.948,-0.652],
+  ["V19","Xàtiva","Valencia","La Costera",38.990,-0.519],
+  ["V20","Sagunt","Valencia","Camp de Morvedre",39.680,-0.274],
+  ["V21","Campo Arcís","Valencia","Requena-Utiel",39.433,-1.160],
+  ["V22","Villalonga","Valencia","La Safor",38.886,-0.207],
+  ["V23","Gandia Marxuquera","Valencia","La Safor",38.957,-0.236],
+  ["V25","Bolbaite","Valencia","Canal de Navarrés",39.061,-0.676],
+  ["V26","Bétera","Valencia","Camp de Túria",39.592,-0.462],
+  ["V27","Chulilla","Valencia","Los Serranos",39.656,-0.891],
+  ["V28","Godelleta","Valencia","Hoya de Buñol",39.420,-0.688],
+  ["V29","Bélgida","Valencia","La Vall d'Albaida",38.858,-0.467],
+  ["V30","Polinyà de Xúquer","Valencia","Ribera Baixa",39.196,-0.370],
+  ["V101","Moncada IVIA","Valencia","L'Horta Nord",39.589,-0.396],
+  ["V102","Carcaixent EEA","Valencia","Ribera Alta",39.122,-0.448],
+  ["V103","Carlet CE Coop","Valencia","Ribera Alta",39.226,-0.521],
+  ["V104","Llutxent EEA","Valencia","La Vall d'Albaida",38.940,-0.357],
+  ["V106","Requena Cerrito","Valencia","Requena-Utiel",39.488,-1.101],
+  ["V109","Algimia de Alfara","Valencia","Camp de Morvedre",39.750,-0.367],
+  ["V110","Valencia UPV","Valencia","València",39.481,-0.342]
+].map(([code, nombre, prov, comarca, lat, lon]) => ({ code, nombre, prov, comarca, lat, lon }));
+/* Lugares para el buscador sin conexión (capitales y municipios de las estaciones, con nombres alternativos) */
+const LUGARES_EXTRA = [
+  { name: "València", alt: "Valencia", lat: 39.470, lon: -0.376, prov: "Valencia", comarca: "València" },
+  { name: "Castelló de la Plana", alt: "Castellón de la Plana Castellon Castello provincia de Castellón", lat: 39.986, lon: -0.051, prov: "Castellón", comarca: "Plana Alta" },
+  { name: "Alacant", alt: "Alicante", lat: 38.345, lon: -0.481, prov: "Alicante", comarca: "L'Alacantí" },
+  { name: "Elx", alt: "Elche", lat: 38.267, lon: -0.698, prov: "Alicante", comarca: "Baix Vinalopó" },
+  { name: "Sueca", alt: "Albufera arroz", lat: 39.203, lon: -0.311, prov: "Valencia", comarca: "Ribera Baixa" },
+  { name: "Gandia", alt: "Gandía", lat: 38.967, lon: -0.181, prov: "Valencia", comarca: "La Safor" },
+  { name: "Requena", alt: "", lat: 39.488, lon: -1.101, prov: "Valencia", comarca: "Requena-Utiel" },
+  { name: "Orihuela", alt: "Oriola", lat: 38.085, lon: -0.944, prov: "Alicante", comarca: "Vega Baja" },
+  { name: "Dénia", alt: "Denia", lat: 38.840, lon: 0.106, prov: "Alicante", comarca: "Marina Alta" },
+  { name: "Vinaròs", alt: "Vinaroz", lat: 40.470, lon: 0.475, prov: "Castellón", comarca: "Baix Maestrat" },
+  { name: "Morella", alt: "", lat: 40.619, lon: -0.101, prov: "Castellón", comarca: "Els Ports" },
+  { name: "Alcoi", alt: "Alcoy", lat: 38.698, lon: -0.474, prov: "Alicante", comarca: "L'Alcoià" },
+  { name: "Ontinyent", alt: "Onteniente", lat: 38.822, lon: -0.606, prov: "Valencia", comarca: "La Vall d'Albaida" },
+  { name: "Alzira", alt: "Alcira", lat: 39.151, lon: -0.435, prov: "Valencia", comarca: "Ribera Alta" },
+  { name: "Burriana", alt: "Borriana", lat: 39.889, lon: -0.085, prov: "Castellón", comarca: "Plana Baixa" },
+  { name: "Benicarló", alt: "", lat: 40.417, lon: 0.425, prov: "Castellón", comarca: "Baix Maestrat" },
+  { name: "Utiel", alt: "", lat: 39.567, lon: -1.205, prov: "Valencia", comarca: "Requena-Utiel" },
+  { name: "Ademuz", alt: "Racó d'Ademús", lat: 40.062, lon: -1.286, prov: "Valencia", comarca: "Racó d'Ademús" }
+];
+const ALT_EST = { V19: "Játiva", V20: "Sagunto", V02: "Liria", CS13: "Villarreal", CS101: "Villarreal", CS01: "Vall de Uxó", A03: "Villajoyosa", A09: "Crevillent", A101: "Elche", A21: "Oriola", V06: "Tabernes", V07: "Villanueva de Castellón", V23: "Gandía", CS05: "Castellón de la Plana" };
+function distKm(a, b, c, d) { const R = 6371, r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
+function nearestStation(lat, lon) { let best = null; for (const e of ESTACIONES) { if (e.code === "A1020") continue; const d = distKm(lat, lon, e.lat, e.lon); if (!best || d < best.d) best = { ...e, d }; } return best; }
+const estByCode = c => ESTACIONES.find(e => e.code === c);
+
+/* Calendario orientativo de plagas y enfermedades (Comunitat Valenciana) */
+const ALERTAS = [
+  // Cítricos
+  {c:"Cítricos",n:"Piojo rojo de California",s:"Aonidiella aurantii",t:"Plaga",m:[5,6,7,8,9,10],r:null,nota:"Seguimiento con trampas de feromona. Momento clave: formas sensibles de 1ª y 2ª generación (mayo-julio). Favorecer Aphytis melinus."},
+  {c:"Cítricos",n:"Mosca mediterránea de la fruta",s:"Ceratitis capitata",t:"Plaga",m:[6,7,8,9,10,11,12],r:"moscaFruta",nota:"Riesgo en variedades tempranas desde el cambio de color. Trampeo masivo y actuación según capturas."},
+  {c:"Cítricos",n:"Ácaro rojo",s:"Panonychus citri",t:"Plaga",m:[3,4,5,10,11,12],r:null,nota:"Picos en primavera y otoño. Muestrear hojas y valorar la fauna auxiliar (fitoseidos)."},
+  {c:"Cítricos",n:"Araña roja",s:"Tetranychus urticae",t:"Plaga",m:[6,7,8,9,10],r:"calorSeco",nota:"Clementinas y limonero: manchas cloróticas en hoja. Se ve favorecida por calor y ambiente seco."},
+  {c:"Cítricos",n:"Cotonet de Sudáfrica",s:"Delottococcus aberiae",t:"Plaga",m:[4,5,6,7,8],r:null,nota:"Deforma los frutos en cuajado. Revisar troncos y frutos pequeños, sobre todo junto a caminos."},
+  {c:"Cítricos",n:"Cotonet",s:"Planococcus citri",t:"Plaga",m:[6,7,8,9,10],r:null,nota:"Sueltas de Cryptolaemus montrouzieri en verano-otoño para bajar población."},
+  {c:"Cítricos",n:"Minador de los cítricos",s:"Phyllocnistis citrella",t:"Plaga",m:[6,7,8,9,10],r:null,nota:"Daña brotaciones tiernas de verano y otoño; importante en plantones y reinjertos."},
+  {c:"Cítricos",n:"Pulgones",s:"Aphis spiraecola, A. gossypii",t:"Plaga",m:[3,4,5],r:null,nota:"Brotación de primavera. Revisar porcentaje de brotes ocupados antes de decidir."},
+  {c:"Cítricos",n:"Trips africano de los cítricos",s:"Scirtothrips aurantii",t:"Vigilancia",m:[4,5,6,7,8,9,10],r:null,nota:"Plaga de cuarentena detectada en la Comunitat Valenciana. Comunicar sospechas al Servicio de Sanidad Vegetal."},
+  {c:"Cítricos",n:"Aguado y podredumbre de cuello",s:"Phytophthora spp.",t:"Enfermedad",m:[9,10,11,12,1,2],r:"lluviaFuerte",nota:"Lluvias intensas y encharcamiento. Vigilar frutos bajos y cuello del árbol."},
+  {c:"Cítricos",n:"Alternaria",s:"Alternaria alternata",t:"Enfermedad",m:[3,4,5,6,7,8,9,10],r:"humedoTemplado",nota:"Fortune, Nova, Minneola y otras sensibles. Riesgo con humedad alta y temperaturas suaves."},
+  // Arroz
+  {c:"Arroz",n:"Barrenador del arroz (cucat)",s:"Chilo suppressalis",t:"Plaga",m:[5,6,7,8,9],r:null,nota:"Campaña de confusión sexual en la zona arrocera. Vuelos de 1ª (mayo-junio) y 2ª generación (julio-agosto)."},
+  {c:"Arroz",n:"Piricularia",s:"Magnaporthe oryzae",t:"Enfermedad",m:[6,7,8,9],r:"piricularia",nota:"Variedades sensibles (p. ej. Bomba). Riesgo con noches húmedas y templadas; vigilar cuello de la panícula."},
+  {c:"Arroz",n:"Pudenta",s:"Eysarcoris ventralis",t:"Plaga",m:[7,8,9],r:null,nota:"Daña el grano en estado lechoso. Muestrear con manga entomológica en el espigado."},
+  {c:"Arroz",n:"Malas hierbas (Echinochloa, arroz salvaje)",s:"Echinochloa spp., Oryza sativa (borde)",t:"Malas hierbas",m:[5,6,7],r:null,nota:"Control temprano tras la siembra; vigilar resistencias a herbicidas."},
+  // Vid
+  {c:"Vid",n:"Mildiu",s:"Plasmopara viticola",t:"Enfermedad",m:[4,5,6,7],r:"mildiuVid",nota:"Regla 3-10: brotes de 10 cm, 10 mm de lluvia en 24-48 h y 10 °C de temperatura."},
+  {c:"Vid",n:"Oídio",s:"Erysiphe necator",t:"Enfermedad",m:[4,5,6,7,8],r:"oidio",nota:"Favorecido por temperaturas de 20-30 °C, sin necesidad de lluvia."},
+  {c:"Vid",n:"Polilla del racimo",s:"Lobesia botrana",t:"Plaga",m:[4,5,6,7,8,9],r:null,nota:"Tres generaciones. Confusión sexual y seguimiento de vuelos con trampas."},
+  {c:"Vid",n:"Podredumbre gris",s:"Botrytis cinerea",t:"Enfermedad",m:[8,9],r:"botrytis",nota:"De envero a vendimia, con lluvias y humedad alta."},
+  {c:"Vid",n:"Mosquito verde",s:"Jacobiasca lybica",t:"Plaga",m:[6,7,8,9],r:null,nota:"Contar ninfas en el envés de las hojas."},
+  // Caqui
+  {c:"Caqui",n:"Mancha foliar",s:"Mycosphaerella nawae",t:"Enfermedad",m:[4,5,6],r:"mycos",nota:"Periodo de infección en primavera con lluvia o humedad alta. El IVIA tiene un sistema de seguimiento del inóculo (GIPcaqui).",link:LINK_GIPCAQUI},
+  {c:"Caqui",n:"Mosca blanca",s:"Dialeurodes citri, Parabemisia myricae",t:"Plaga",m:[5,6,7,8,9],r:null,nota:"Seguimiento del ciclo para actuar sobre las primeras fases."},
+  {c:"Caqui",n:"Cotonet",s:"Planococcus citri, Pseudococcus longispinus",t:"Plaga",m:[5,6,7,8,9],r:null,nota:"Revisar cáliz y zona de contacto entre frutos."},
+  {c:"Caqui",n:"Mosca de la fruta",s:"Ceratitis capitata",t:"Plaga",m:[9,10,11],r:"moscaFruta",nota:"Fruta próxima a recolección. Trampeo y control según capturas."},
+  // Olivo
+  {c:"Olivo",n:"Mosca del olivo",s:"Bactrocera oleae",t:"Plaga",m:[7,8,9,10,11],r:"moscaOlivo",nota:"Temperaturas de 20-30 °C la favorecen; por encima de 35 °C su actividad cae."},
+  {c:"Olivo",n:"Prays",s:"Prays oleae",t:"Plaga",m:[4,5,6,7],r:null,nota:"Generación antófaga en floración y carpófaga en cuajado."},
+  {c:"Olivo",n:"Repilo",s:"Fusicladium oleagineum",t:"Enfermedad",m:[10,11,12,1,2,3,4,5],r:"repilo",nota:"Infecta con hoja mojada y 10-20 °C. Tratar antes de los periodos lluviosos de otoño y primavera."},
+  {c:"Olivo",n:"Xylella fastidiosa (vectores)",s:"Philaenus spumarius",t:"Vigilancia",m:[4,5,6,7],r:null,prov:["Alicante"],nota:"Zona demarcada en Alicante. Control de vectores y cubierta vegetal según la normativa vigente."},
+  // Almendro
+  {c:"Almendro",n:"Xylella fastidiosa (vectores)",s:"Philaenus spumarius",t:"Vigilancia",m:[3,4,5,6],r:null,prov:["Alicante"],nota:"Zona demarcada en Alicante. Medidas obligatorias de control de vectores; comunicar síntomas."},
+  {c:"Almendro",n:"Mancha ocre",s:"Polystigma ochraceum",t:"Enfermedad",m:[3,4,5,6],r:"lluviaTemplada",nota:"Infecciones en primavera lluviosa, desde la caída de pétalos."},
+  {c:"Almendro",n:"Monilia",s:"Monilinia laxa",t:"Enfermedad",m:[2,3],r:"lluviaTemplada",nota:"Floración con lluvias."},
+  {c:"Almendro",n:"Pulgones",s:"Brachycaudus helichrysi, Hyalopterus amygdali",t:"Plaga",m:[2,3,4],r:null,nota:"Desde la brotación; vigilar hojas enrolladas."},
+  {c:"Almendro",n:"Avispilla del almendro",s:"Eurytoma amygdali",t:"Plaga",m:[4,5],r:null,nota:"Recoger y destruir las almendras momificadas del árbol en invierno."},
+  // Frutales de hueso
+  {c:"Frutales de hueso",n:"Abolladura",s:"Taphrina deformans",t:"Enfermedad",m:[11,12,1,2,3],r:"lluviaTemplada",nota:"Tratamientos a caída de hojas y en el desborre."},
+  {c:"Frutales de hueso",n:"Pulgón verde",s:"Myzus persicae",t:"Plaga",m:[2,3,4],r:null,nota:"De botón rosa a caída de pétalos."},
+  {c:"Frutales de hueso",n:"Trips de las flores",s:"Frankliniella occidentalis",t:"Plaga",m:[3,4],r:null,nota:"Nectarina: daños en floración y cuajado."},
+  {c:"Frutales de hueso",n:"Piojo de San José",s:"Quadraspidiotus perniciosus",t:"Plaga",m:[4,5,6,7],r:null,nota:"Seguimiento de la salida de larvas móviles."},
+  {c:"Frutales de hueso",n:"Anarsia y grafolita",s:"Anarsia lineatella, Grapholita molesta",t:"Plaga",m:[4,5,6,7,8,9],r:null,nota:"Seguimiento de vuelos con trampas; confusión sexual."},
+  {c:"Frutales de hueso",n:"Mosca de la fruta",s:"Ceratitis capitata",t:"Plaga",m:[6,7,8,9],r:"moscaFruta",nota:"Variedades de media estación y tardías."},
+  {c:"Frutales de hueso",n:"Monilia",s:"Monilinia spp.",t:"Enfermedad",m:[2,3,5,6,7],r:"lluviaTemplada",nota:"En floración y en precosecha con lluvia."},
+  // Hortícolas
+  {c:"Hortícolas (tomate)",n:"Polilla del tomate",s:"Tuta absoluta",t:"Plaga",m:[3,4,5,6,7,8,9,10,11],r:null,nota:"Trampas de feromona y control biológico (Nesidiocoris tenuis)."},
+  {c:"Hortícolas (tomate)",n:"Mosca blanca y virosis (TYLCV)",s:"Bemisia tabaci",t:"Plaga",m:[5,6,7,8,9,10],r:null,nota:"Mallas, plantas libres de virus y eliminar restos de cultivo."},
+  {c:"Hortícolas (tomate)",n:"Mildiu",s:"Phytophthora infestans",t:"Enfermedad",m:[3,4,5,6,9,10,11],r:"mildiuTomate",nota:"Humedad muy alta con 10-25 °C."},
+  {c:"Hortícolas (tomate)",n:"Araña roja",s:"Tetranychus urticae",t:"Plaga",m:[6,7,8,9],r:"calorSeco",nota:"Calor y ambiente seco."},
+  {c:"Hortícolas (tomate)",n:"Trips y virus del bronceado (TSWV)",s:"Frankliniella occidentalis",t:"Plaga",m:[4,5,6,7,8,9],r:null,nota:"Variedades resistentes y control de trips."}
+];
+
+/* ============ reglas de riesgo meteorológico ============ */
+/* d = array de días {date,tmax,tmin,tmed,hr,precip} */
+function sumWin(d, i, n, k) { let s = 0; for (let j = Math.max(0, i - n + 1); j <= i; j++) s += (d[j][k] || 0); return s; }
+const REGLAS = {
+  mildiuVid(d) {
+    let alto = 0, med = 0;
+    d.forEach((x, i) => { const p = sumWin(d, i, 2, "precip"); if (p >= 10 && (x.tmin ?? x.tmed) >= 10) alto++; else if (p >= 5 && x.tmed >= 10) med++; });
+    return alto ? ["alto", "Lluvia ≥10 mm en 48 h con mínimas ≥10 °C (regla 3-10)"] : med ? ["medio", "Lluvias moderadas con temperaturas suaves"] : ["bajo", "No se cumple la regla 3-10"];
+  },
+  oidio(d) { const n = d.filter(x => x.tmed >= 20 && x.tmed <= 30).length; return n >= 5 ? ["alto", `${n} días con 20-30 °C de media`] : n >= 3 ? ["medio", `${n} días con 20-30 °C de media`] : ["bajo", "Temperaturas poco favorables"]; },
+  piricularia(d) { const n = d.filter(x => x.hr !== null && x.hr >= 85 && x.tmed >= 20 && x.tmed <= 28).length; return n >= 2 ? ["alto", `${n} días con HR ≥85 % y 20-28 °C`] : n === 1 ? ["medio", "Un día con humedad alta y temperatura favorable"] : ["bajo", "Humedad o temperatura poco favorables"]; },
+  repilo(d) { const n = d.filter(x => (x.precip >= 2 || (x.hr ?? 0) >= 90) && x.tmed >= 10 && x.tmed <= 20).length; return n >= 2 ? ["alto", `${n} días con hoja mojada y 10-20 °C`] : n === 1 ? ["medio", "Un día con lluvia y 10-20 °C"] : ["bajo", "Sin periodos de hoja mojada con 10-20 °C"]; },
+  mycos(d) { const n = d.filter(x => x.precip >= 2 || (x.hr ?? 0) >= 85).length; return n >= 2 ? ["alto", `${n} días con lluvia o humedad alta`] : n === 1 ? ["medio", "Un día con lluvia o humedad alta"] : ["bajo", "Tiempo seco"]; },
+  mildiuTomate(d) { const n = d.filter(x => (x.hr ?? 0) >= 90 && x.tmed >= 10 && x.tmed <= 25).length; const p = d.filter(x => x.precip >= 3 && x.tmed >= 10 && x.tmed <= 25).length; return n >= 2 || p >= 2 ? ["alto", "Humedad muy alta o lluvias con 10-25 °C"] : n || p ? ["medio", "Algún día con humedad alta y 10-25 °C"] : ["bajo", "Condiciones poco favorables"]; },
+  moscaOlivo(d) { const hot = d.filter(x => x.tmax >= 35).length; const ok = d.filter(x => x.tmed >= 20 && x.tmax < 35).length; return hot >= 3 ? ["bajo", "Calor extremo (>35 °C) reduce su actividad"] : ok >= 4 ? ["medio", "Temperaturas favorables (20-30 °C)"] : ["bajo", "Temperaturas poco favorables"]; },
+  moscaFruta(d) { const n = d.filter(x => x.tmed >= 20).length; return n >= 4 ? ["medio", "Temperaturas medias ≥20 °C: actividad alta"] : ["bajo", "Temperaturas frescas"]; },
+  calorSeco(d) { const n = d.filter(x => x.tmax >= 30 && (x.hr ?? 100) < 55).length; return n >= 3 ? ["alto", `${n} días de calor seco`] : n >= 1 ? ["medio", "Algún día de calor seco"] : ["bajo", "Sin calor seco"]; },
+  lluviaFuerte(d) { const s = d.reduce((a, x) => a + (x.precip || 0), 0); const max = Math.max(0, ...d.map(x => x.precip || 0)); return max >= 30 || s >= 50 ? ["alto", `Lluvia intensa (${f1(s)} mm en el periodo)`] : s >= 15 ? ["medio", `${f1(s)} mm en el periodo`] : ["bajo", "Sin lluvias importantes"]; },
+  humedoTemplado(d) { const n = d.filter(x => ((x.hr ?? 0) >= 85 || x.precip >= 2) && x.tmed >= 15 && x.tmed <= 30).length; return n >= 2 ? ["alto", `${n} días húmedos y templados`] : n === 1 ? ["medio", "Un día húmedo y templado"] : ["bajo", "Ambiente seco"]; },
+  lluviaTemplada(d) { const n = d.filter(x => x.precip >= 2 && x.tmed >= 7 && x.tmed <= 22).length; return n >= 2 ? ["alto", `${n} días de lluvia con temperaturas suaves`] : n === 1 ? ["medio", "Un día de lluvia con temperaturas suaves"] : ["bajo", "Sin lluvias en periodo sensible"]; },
+  botrytis(d) { const n = d.filter(x => x.precip >= 3 || (x.hr ?? 0) >= 85).length; return n >= 2 ? ["alto", `${n} días con lluvia o humedad alta`] : n === 1 ? ["medio", "Un día húmedo"] : ["bajo", "Tiempo seco"]; }
+};
+
+/* ============ estado ============ */
+const DEF_SIG = {
+  wmsUrl: "https://sigpac-hubcloud.es/wms",
+  wmsLayer: "recinto",
+  recinfoUrl: "https://sigpac-hubcloud.es/servicioconsultassigpac/query/recinfo/{prov}/{mun}/{agr}/{zona}/{pol}/{par}/{rec}.geojson"
+};
+const DEF_SETTINGS = Object.assign({ lugar: "València", lat: 39.4699, lon: -0.3763, prov: "Valencia", comarca: "València", locSrc: "", stCode: "", stName: "", stUrl: "datos/{codigo}.json", stAuto: true, geoAuto: true }, DEF_SIG);
+const S = { settings: { ...DEF_SETTINGS }, parcelas: [], trat: [], station: { code: "", name: "", rows: [], updated: null }, stStatus: null, wx: null, online: null, store: null, selParc: null };
+
+/* ============ almacenamiento ============ */
+const LS_KEY = "agropanel_v1";
+const LocalStore = {
+  label: "en este navegador (solo este dispositivo)",
+  _all() { try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch (e) { return {}; } },
+  _save(all) { try { localStorage.setItem(LS_KEY, JSON.stringify(all)); return true; } catch (e) { toast("No se ha podido guardar en este navegador"); return false; } },
+  async loadAll() { const a = this._all(); return { settings: a.settings || null, station: a.station || null, parcelas: a.parcelas || [], trat: a.trat || [] }; },
+  async putItem(kind, obj) { const a = this._all(); a[kind] = (a[kind] || []).filter(x => x.id !== obj.id).concat([obj]); this._save(a); },
+  async delItem(kind, id) { const a = this._all(); a[kind] = (a[kind] || []).filter(x => x.id !== id); this._save(a); },
+  async putDoc(key, obj) { const a = this._all(); a[key] = obj; this._save(a); }
+};
+function makeDbStore(db, id) {
+  const base = `data/users/${id}`;
+  const app = db.doc(base + "/app");
+  const queues = {};
+  const q = (path, fn) => { queues[path] = (queues[path] || Promise.resolve()).then(fn).catch(e => { console.error(e); toast(e && e.code === "quota_exceeded" ? "Espacio de datos lleno: borra registros antiguos" : "No se ha podido guardar el cambio"); }); return queues[path]; };
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms))]);
+  return {
+    label: "en tu cuenta (se conserva entre dispositivos al abrir esta página)",
+    async loadAll() {
+      const [st, sn, ps, ts] = await withTimeout(Promise.all([
+        db.doc(base + "/settings").get(), db.doc(base + "/station").get(),
+        app.collection("parcelas").get(), app.collection("trat").get()
+      ]), 10000);
+      return {
+        settings: st.exists ? st.data() : null,
+        station: sn.exists ? sn.data() : null,
+        parcelas: ps.docs.map(d => d.data()),
+        trat: ts.docs.map(d => d.data())
+      };
+    },
+    putItem(kind, obj) { const ref = app.collection(kind).doc(obj.id); return q(ref.path, () => ref.set(JSON.parse(JSON.stringify(obj)))); },
+    delItem(kind, id) { const ref = app.collection(kind).doc(id); return q(ref.path, () => ref.delete()); },
+    putDoc(key, obj) { const ref = db.doc(base + "/" + key); return q(ref.path, () => ref.set(JSON.parse(JSON.stringify(obj)))); }
+  };
+}
+async function initStore() {
+  if (window.claude && typeof window.claude.use === "function") {
+    try {
+      const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+      const id = user && typeof user.id === "function" ? await user.id() : null;
+      if (db && id) return makeDbStore(db, id);
+    } catch (e) { console.warn(e); }
+  }
+  return LocalStore;
+}
+
+/* ============ navegación ============ */
+const ROUTES = { inicio: [""], tiempo: ["prediccion", "ventanas", "estacion"], parcelas: ["mapa", "listado"], cuaderno: ["registro", "plazos", "fertilizacion", "exportar"], alertas: ["mes", "calendario", "riesgo"], ajustes: [""] };
+function parseRoute() {
+  const h = (location.hash || "").slice(1); const i = h.indexOf("-");
+  let sec = i < 0 ? h : h.slice(0, i), sub = i < 0 ? "" : h.slice(i + 1);
+  if (!ROUTES[sec]) { sec = "inicio"; sub = ""; }
+  if (!ROUTES[sec].includes(sub)) sub = ROUTES[sec][0];
+  return [sec, sub];
+}
+let lastSec = null;
+function showView() {
+  const [sec, sub] = parseRoute();
+  $$(".view").forEach(s => s.classList.toggle("on", s.id === "v-" + sec));
+  $$("#tabs a").forEach(a => a.classList.toggle("on", a.dataset.v === sec));
+  const view = $("#v-" + sec);
+  $$(".subv", view).forEach(p => p.classList.toggle("on", p.dataset.subv === sub));
+  $$(".subnav a", view).forEach(a => a.classList.toggle("on", a.dataset.sub === sub));
+  if (sec !== lastSec) window.scrollTo(0, 0);
+  lastSec = sec;
+  render(sec);
+  if (sec === "parcelas" && sub === "mapa") setTimeout(initMap, 30);
+}
+window.addEventListener("hashchange", showView);
+function render(v) {
+  if (!S.store) return;
+  ({ inicio: renderHome, tiempo: renderTiempo, parcelas: renderParcelas, cuaderno: renderCuaderno, alertas: renderAlertas, ajustes: renderAjustes })[v]();
+}
+function rerender() { render(parseRoute()[0]); updatePill(); }
+function updatePill() { const s = S.settings; $("#locTxt").textContent = `${s.lugar}${s.comarca && s.comarca !== s.lugar ? " · " + s.comarca : ""}${s.locSrc === "gps" ? " (tu ubicación)" : ""}`; }
+
+/* ============ ubicación: GPS del dispositivo y buscador ============ */
+async function setLocation(loc, opts = {}) {
+  const st = nearestStation(loc.lat, loc.lon);
+  const patch = { lugar: loc.lugar, lat: Math.round(loc.lat * 1e4) / 1e4, lon: Math.round(loc.lon * 1e4) / 1e4, locSrc: loc.src || "" };
+  patch.prov = loc.prov || (st && st.d < 40 ? st.prov : S.settings.prov);
+  patch.comarca = loc.comarca || (st && st.d < 15 ? st.comarca : "");
+  await saveSettings(patch);
+  if (S.settings.stAuto !== false && st && st.d < 60 && st.code !== S.settings.stCode) await selectStation(st.code, true);
+  if (map) map.setView([patch.lat, patch.lon], 13);
+  if ($("#aCult")._init) $("#aProv").value = patch.prov;
+  if (!opts.silent) toast("Ubicación: " + patch.lugar);
+  loadWeather(); rerender();
+}
+function geoMe(silent) {
+  const msg = t => { $("#geoMsg").textContent = t; };
+  if (!navigator.geolocation) { msg("Este navegador no permite obtener la ubicación. Usa el buscador."); return; }
+  msg("Obteniendo tu ubicación…");
+  let done = false;
+  const fail = (why) => { if (done) return; done = true; msg(why || "No se ha podido obtener la ubicación (permiso denegado o no disponible en esta vista). Usa el buscador."); if (!silent) toast("Ubicación no disponible: usa el buscador"); };
+  const timer = setTimeout(() => fail(), 12000);
+  try {
+    navigator.geolocation.getCurrentPosition(async pos => {
+      if (done) return; done = true; clearTimeout(timer);
+      const lat = pos.coords.latitude, lon = pos.coords.longitude, st = nearestStation(lat, lon);
+      let name = "";
+      try { const j = await (await fetchWithTimeout(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=es`, 6000)).json(); name = j.city || j.locality || ""; } catch (e) { }
+      if (!name) name = st && st.d < 15 ? `Cerca de ${st.nombre}` : "Mi ubicación";
+      msg(`Ubicación detectada (precisión ±${Math.round(pos.coords.accuracy)} m).`);
+      await setLocation({ lugar: name, lat, lon, src: "gps" }, { silent });
+      $("#locPop").hidden = true;
+    }, err => { clearTimeout(timer); fail(err && err.code === 1 ? "Has denegado el permiso de ubicación. Puedes activarlo en el navegador o usar el buscador." : undefined); }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+  } catch (e) { clearTimeout(timer); fail(); }
+}
+function offlinePlaces(q) {
+  const n = norm(q); if (!n) return [];
+  const est = ESTACIONES.filter(e => e.code !== "A1020").map(e => ({ name: e.nombre, sub: `${e.comarca} · ${e.prov} · estación ${e.code}`, lat: e.lat, lon: e.lon, prov: e.prov, comarca: e.comarca, key: norm(`${e.nombre} ${e.code} ${e.comarca} ${e.prov} ${ALT_EST[e.code] || ""}`) }));
+  const extra = LUGARES_EXTRA.map(l => ({ name: l.name, sub: `${l.comarca} · ${l.prov}`, lat: l.lat, lon: l.lon, prov: l.prov, comarca: l.comarca, key: norm(`${l.name} ${l.alt} ${l.comarca} ${l.prov}`) }));
+  const all = extra.concat(est).filter(p => p.key.includes(n));
+  const seen = new Set(); return all.filter(p => { const k = norm(p.name); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 10);
+}
+let locTimer = null;
+function onLocSearch() {
+  const q = $("#locQ").value.trim(); clearTimeout(locTimer);
+  const draw = (local, online) => {
+    S._locRes = local.concat(online);
+    let h = "";
+    if (local.length) h += `<div class="grp">Comunitat Valenciana</div>` + local.map((p, i) => `<button data-act="pickLoc" data-i="${i}">${esc(p.name)}<small>${esc(p.sub)}</small></button>`).join("");
+    if (online.length) h += `<div class="grp">Más resultados</div>` + online.map((p, i) => `<button data-act="pickLoc" data-i="${local.length + i}">${esc(p.name)}<small>${esc(p.sub)}</small></button>`).join("");
+    if (!h && q) h = `<div class="small muted" style="padding:8px 10px">Sin resultados${S.online === false ? " en la lista local. La búsqueda de cualquier municipio necesita conexión." : "."}</div>`;
+    $("#locRes").innerHTML = h;
+  };
+  const local = offlinePlaces(q); draw(local, []);
+  if (q.length < 3 || S.online === false) return;
+  locTimer = setTimeout(async () => {
+    try {
+      const j = await (await fetchWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=es&countryCode=ES`, 6000)).json();
+      const names = new Set(local.map(p => norm(p.name)));
+      const online = (j.results || []).filter(r => !names.has(norm(r.name))).map(r => {
+        const pv = PROVINCIAS.find(p => norm(r.admin2 || "").startsWith(norm(p).slice(0, 5)) || norm(r.admin2 || "").includes(norm(p)));
+        return { name: r.name, sub: [r.admin2, r.admin1].filter(Boolean).join(" · "), lat: r.latitude, lon: r.longitude, prov: pv || "", comarca: "" };
+      });
+      if ($("#locQ").value.trim() === q) draw(local, online);
+    } catch (e) { }
+  }, 350);
+}
+
+/* ============ estación seleccionada ============ */
+async function selectStation(code, auto) {
+  const e = estByCode(code); if (!e) return;
+  await saveSettings({ stCode: code, stName: `${e.code} · ${e.nombre}` });
+  if (S.station.code !== code) { S.station = { code, name: `${e.code} · ${e.nombre}`, rows: [], updated: null }; await S.store.putDoc("station", S.station); }
+  if (!auto) toast(`Estación seleccionada: ${e.code} · ${e.nombre}`);
+  syncStation(true);
+}
+
+/* ============ meteorología ============ */
+const WMO = c => c === 0 ? ["☀️","Despejado"] : c <= 2 ? ["🌤️","Poco nuboso"] : c === 3 ? ["☁️","Nuboso"] : c <= 48 ? ["🌫️","Niebla"] : c <= 57 ? ["🌦️","Llovizna"] : c <= 67 ? ["🌧️","Lluvia"] : c <= 77 ? ["❄️","Nieve"] : c <= 82 ? ["🌦️","Chubascos"] : ["⛈️","Tormenta"];
+async function loadWeather() {
+  const { lat, lon } = S.settings;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code` +
+    `&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m` +
+    `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,wind_speed_10m_max` +
+    `&timezone=Europe%2FMadrid&forecast_days=7`;
+  try {
+    const j = await (await fetchWithTimeout(url)).json();
+    S.wx = buildWx(j); S.online = true;
+  } catch (e) { S.wx = null; S.online = false; }
+  renderOfflineBanner(); rerender();
+}
+function buildWx(j) {
+  const H = j.hourly, D = j.daily;
+  const hours = H.time.map((t, i) => ({ t, date: t.slice(0, 10), h: +t.slice(11, 13), temp: H.temperature_2m[i], hr: H.relative_humidity_2m[i], p: H.precipitation[i], w: H.wind_speed_10m[i] }));
+  const days = D.time.map((date, i) => {
+    const hs = hours.filter(x => x.date === date);
+    const hr = hs.length ? hs.reduce((a, x) => a + x.hr, 0) / hs.length : null;
+    const tmax = D.temperature_2m_max[i], tmin = D.temperature_2m_min[i];
+    return { date, code: D.weather_code[i], tmax, tmin, tmed: (tmax + tmin) / 2, hr, precip: D.precipitation_sum[i] || 0, pprob: D.precipitation_probability_max ? D.precipitation_probability_max[i] : null, eto: D.et0_fao_evapotranspiration ? D.et0_fao_evapotranspiration[i] : null, vmax: D.wind_speed_10m_max[i], win: treatWindow(hours, date) };
+  });
+  return { current: j.current, days, hours, at: new Date() };
+}
+/* Ventana de tratamiento: horas de 6 a 21 con viento < 11 km/h (≈3 m/s), sin lluvia esa hora ni las 3 siguientes, y 5-28 °C */
+function hourStatus(hours, i) {
+  const x = hours[i];
+  for (let k = 0; k <= 3; k++) { const y = hours[i + k]; if (y && y.p > 0.1) return ["b", k ? "Lluvia en las 3 h siguientes" : `Lluvia (${f1(y.p)} mm)`]; }
+  if (x.w >= 11) return ["b", `Viento ${f1(x.w)} km/h`];
+  if (x.temp > 28) return ["b", `Calor (${f1(x.temp)} °C)`];
+  if (x.temp < 5) return ["b", `Frío (${f1(x.temp)} °C)`];
+  return ["g", `Apta · ${f1(x.temp)} °C · viento ${f1(x.w)} km/h · HR ${Math.round(x.hr)} %`];
+}
+function treatWindow(hours, date) {
+  const idx = hours.map((x, i) => x.date === date ? i : -1).filter(i => i >= 0);
+  const good = idx.filter(i => hours[i].h >= 6 && hours[i].h <= 21 && hourStatus(hours, i)[0] === "g").map(i => hours[i].h);
+  if (!good.length) return null;
+  let best = [good[0], good[0]], cur = [good[0], good[0]];
+  for (let k = 1; k < good.length; k++) { if (good[k] === cur[1] + 1) cur[1] = good[k]; else cur = [good[k], good[k]]; if (cur[1] - cur[0] > best[1] - best[0]) best = cur.slice(); }
+  return { from: best[0], to: best[1] + 1, hours: good.length };
+}
+function riskDays() {
+  if (S.wx) return { days: S.wx.days.slice(0, 5), src: "predicción próximos 5 días" };
+  const r = S.station.rows; if (r && r.length) return { days: r.slice(-7), src: "últimos 7 días de la estación" };
+  return null;
+}
+
+/* ============ estación: lectura de CSV / JSON ============ */
+function parseDate(s) {
+  s = String(s).trim(); let m;
+  if ((m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/))) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  if ((m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/))) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  if ((m = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2})\b/))) return `20${m[3]}-${pad(m[2])}-${pad(m[1])}`;
+  return null;
+}
+function splitCSVLine(line, sep) {
+  const out = []; let cur = "", inq = false;
+  for (let i = 0; i < line.length; i++) { const c = line[i]; if (c === '"') { if (inq && line[i + 1] === '"') { cur += '"'; i++; } else inq = !inq; } else if (c === sep && !inq) { out.push(cur); cur = ""; } else cur += c; }
+  out.push(cur); return out.map(x => x.trim());
+}
+function stationFromRecords(header, rows) {
+  const h = header.map(norm);
+  const find = (...res) => { for (const re of res) { const i = h.findIndex(x => re.test(x)); if (i >= 0) return i; } return -1; };
+  const I = {
+    date: find(/^(fecha|date|dia|day|timestamp|time)/),
+    tmax: find(/^(tmax|tempmax|temperaturamax|maxtemp|tamax|tempmaxima)/),
+    tmin: find(/^(tmin|tempmin|temperaturamin|mintemp|tamin|tempminima)/),
+    tmed: find(/^(tmed|tmedia|tempmed|temperaturamed|tamed|tm$)/),
+    temp: find(/^(temp|temperatura|ta|t)$/, /^temperatura/),
+    hr: find(/(hrmed|hrmedia|humedadmedia|humedadrelativamedia|^hummed)/, /^(hr|rh|humedad|humedadrelativa)$/, /^(hr|humedad)(?!max|min)/),
+    p: find(/(precip|lluvia|^prec|pluv|rain|^pp$)/),
+    eto: find(/(etpmon|eto|et0|^etp|evapotrans)/),
+    w: find(/(vvmed|vmed|velviento|velocidadviento|viento|wind)/)
+  };
+  if (I.date < 0) throw new Error("No encuentro la columna de fecha");
+  const by = {};
+  for (const r of rows) {
+    const date = parseDate(r[I.date]); if (!date) continue;
+    const g = by[date] || (by[date] = { tx: [], tn: [], tm: [], hr: [], p: 0, pn: 0, eto: 0, en: 0, w: [] });
+    const v = i => i >= 0 ? num(r[i]) : null;
+    const tx = v(I.tmax), tn = v(I.tmin), tm = v(I.tmed), t = v(I.temp);
+    if (tx !== null) g.tx.push(tx); else if (t !== null) g.tx.push(t);
+    if (tn !== null) g.tn.push(tn); else if (t !== null) g.tn.push(t);
+    if (tm !== null) g.tm.push(tm); else if (t !== null) g.tm.push(t);
+    const hr = v(I.hr); if (hr !== null) g.hr.push(hr);
+    const p = v(I.p); if (p !== null) { g.p += p; g.pn++; }
+    const e = v(I.eto); if (e !== null) { g.eto += e; g.en++; }
+    const w = v(I.w); if (w !== null) g.w.push(w);
+  }
+  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+  const out = Object.keys(by).sort().map(date => {
+    const g = by[date]; const tmax = g.tx.length ? Math.max(...g.tx) : null, tmin = g.tn.length ? Math.min(...g.tn) : null;
+    let tmed = avg(g.tm); if (tmed === null && tmax !== null && tmin !== null) tmed = (tmax + tmin) / 2;
+    return { date, tmax, tmin, tmed, hr: avg(g.hr), precip: g.pn ? g.p : 0, eto: g.en ? g.eto : null, w: avg(g.w) };
+  }).filter(x => x.tmax !== null || x.precip || x.tmed !== null);
+  if (!out.length) throw new Error("No hay filas con datos reconocibles");
+  return out;
+}
+function parseStationText(text) {
+  text = text.replace(/^﻿/, "").trim();
+  if (text[0] === "[" || text[0] === "{") {
+    let j = JSON.parse(text); if (!Array.isArray(j)) j = j.datos || j.data || j.rows || j.registros || Object.values(j).find(Array.isArray) || [];
+    if (!j.length) throw new Error("JSON sin registros");
+    const header = Object.keys(j[0]); return stationFromRecords(header, j.map(o => header.map(k => o[k])));
+  }
+  let lines = text.split(/\r?\n/).filter(l => l.trim());
+  // saltar líneas de cabecera descriptivas hasta encontrar la fila con "fecha"/"date"
+  const hi = lines.findIndex(l => /fecha|date|dia|día/i.test(l)); if (hi > 0) lines = lines.slice(hi);
+  const first = lines[0]; const cnt = c => first.split(c).length;
+  const sep = cnt("\t") > 2 ? "\t" : cnt(";") >= cnt(",") ? ";" : ",";
+  const header = splitCSVLine(first, sep);
+  return stationFromRecords(header, lines.slice(1).map(l => splitCSVLine(l, sep)));
+}
+async function saveStation(rows, name, source) {
+  const code = S.settings.stCode || S.station.code || "";
+  const merged = {}; (S.station.code === code ? S.station.rows || [] : []).forEach(r => merged[r.date] = r); rows.forEach(r => merged[r.date] = r);
+  const all = Object.keys(merged).sort().map(k => merged[k]).slice(-400);
+  S.station = { code, name: name || S.settings.stName || S.station.name || "Estación", rows: all, updated: new Date().toISOString(), source: source || "" };
+  await S.store.putDoc("station", S.station);
+}
+
+/* ============ geometría ============ */
+function ringArea(r) {
+  const R = 6378137, d = Math.PI / 180; let s = 0; const n = r.length;
+  for (let i = 0; i < n; i++) { const [x1, y1] = r[i], [x2, y2] = r[(i + 1) % n]; s += (x2 - x1) * d * (2 + Math.sin(y1 * d) + Math.sin(y2 * d)); }
+  return Math.abs(s * R * R / 2);
+}
+function areaHa(g) {
+  if (!g) return 0; const polys = g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : [];
+  let a = 0; for (const p of polys) { a += ringArea(p[0]); for (let i = 1; i < p.length; i++) a -= ringArea(p[i]); } return a / 10000;
+}
+function centroid(g) {
+  const ring = g.type === "Polygon" ? g.coordinates[0] : g.type === "MultiPolygon" ? g.coordinates[0][0] : null; if (!ring) return null;
+  let x = 0, y = 0; ring.forEach(c => { x += c[0]; y += c[1]; }); return [y / ring.length, x / ring.length];
+}
+function roundGeom(g) { const r = a => Array.isArray(a[0]) ? a.map(r) : [Math.round(a[0] * 1e6) / 1e6, Math.round(a[1] * 1e6) / 1e6]; return { type: g.type, coordinates: r(g.coordinates) }; }
+function geomsFromGeoJSON(j) {
+  const out = [];
+  const add = (geom, props) => { if (!geom) return; if (geom.type === "Polygon" || geom.type === "MultiPolygon") out.push({ geom, props: props || {} }); else if (geom.type === "GeometryCollection") geom.geometries.forEach(g => add(g, props)); };
+  if (j.type === "FeatureCollection") j.features.forEach(f => add(f.geometry, f.properties)); else if (j.type === "Feature") add(j.geometry, j.properties); else add(j, {});
+  return out;
+}
+function geomsFromKML(text) {
+  const doc = new DOMParser().parseFromString(text, "application/xml"); const out = [];
+  doc.querySelectorAll("Placemark").forEach(pm => {
+    const name = pm.querySelector("name")?.textContent || "";
+    pm.querySelectorAll("Polygon").forEach(pg => {
+      const rings = [];
+      const outer = pg.querySelector("outerBoundaryIs coordinates"); if (!outer) return;
+      const parse = t => t.trim().split(/\s+/).map(s => s.split(",").map(Number)).filter(c => c.length >= 2 && isFinite(c[0])).map(c => [c[0], c[1]]);
+      rings.push(parse(outer.textContent)); pg.querySelectorAll("innerBoundaryIs coordinates").forEach(c => rings.push(parse(c.textContent)));
+      out.push({ geom: { type: "Polygon", coordinates: rings }, props: { nombre: name } });
+    });
+  });
+  return out;
+}
+function refFromProps(p) {
+  const g = k => { for (const key of Object.keys(p)) if (norm(key) === k) return p[key]; return ""; };
+  return { prov: g("provincia"), mun: g("municipio"), agr: g("agregado") || 0, zona: g("zona") || 0, pol: g("poligono"), par: g("parcela"), rec: g("recinto") };
+}
+const refTxt = r => r && r.prov && r.mun && r.pol && r.par ? `${r.prov}:${r.mun}:${r.agr || 0}:${r.zona || 0}:${r.pol}:${r.par}${r.rec ? ":" + r.rec : ""}` : "";
+
+/* ============ INICIO ============ */
+function activePS() {
+  const t = today();
+  return S.trat.filter(x => x.tipo === "fito" && num(x.ps) > 0 && x.fecha).map(x => ({ ...x, hasta: addDays(x.fecha, num(x.ps)) })).filter(x => x.hasta > t).sort((a, b) => a.hasta.localeCompare(b.hasta));
+}
+function myCrops() { const s = new Set(S.parcelas.map(p => p.cultivo).filter(Boolean)); return s.size ? Array.from(s) : []; }
+function alertsNow(crops, month) {
+  const prov = S.settings.prov;
+  return ALERTAS.filter(a => crops.includes(a.c) && a.m.includes(month) && (!a.prov || a.prov.includes(prov)));
+}
+function evalRisk(a) { const rd = riskDays(); if (!a.r || !rd) return null; const [lvl, why] = REGLAS[a.r](rd.days); return { lvl, why, src: rd.src }; }
+function renderHome() {
+  const d = new Date();
+  $("#hoyTxt").textContent = `${DIAS[d.getDay()]} ${d.getDate()} de ${MESES_L[d.getMonth()]} de ${d.getFullYear()} · ${S.settings.lugar}`;
+  const y = String(d.getFullYear()), m = d.getMonth() + 1;
+  const tratAno = S.trat.filter(x => (x.fecha || "").startsWith(y));
+  const crops = myCrops(); const al = alertsNow(crops.length ? crops : CULTIVOS, m);
+  const ps = activePS();
+  const supTot = S.parcelas.reduce((a, p) => a + (num(p.sup) || 0), 0);
+  const altos = crops.length ? al.filter(a => { const r = evalRisk(a); return r && r.lvl === "alto"; }).length : 0;
+  const wxStat = S.wx ? `${f1(S.wx.current.temperature_2m)} °C ahora · ${S.wx.days[0].win ? `tratar ${pad(S.wx.days[0].win.from)}-${pad(S.wx.days[0].win.to)} h` : "hoy sin ventana"}` : S.station.rows.length ? `${S.station.rows.length} días de estación` : "Importa los datos de tu estación";
+  $("#hubTiles").innerHTML = [
+    ["tiempo", "🌤️", "Tiempo y estación", "Predicción a 7 días, horas aptas para tratar y datos de tu estación agroclimática.", wxStat],
+    ["parcelas", "🗺️", "Parcelas SIGPAC", "Mapa con tus recintos, búsqueda por referencia SIGPAC, dibujo e importación.", `${S.parcelas.length} parcelas · ${f2(supTot)} ha`],
+    ["cuaderno", "📒", "Cuaderno", "Aplicaciones de fitosanitarios y fertilizantes, plazos de seguridad y balance de UF.", `${tratAno.length} aplicaciones en ${y}${ps.length ? ` · ${ps.length} plazos en curso` : ""}`],
+    ["alertas", "🐛", "Alertas", "Plagas y enfermedades por cultivo, época y zona, con riesgo según el tiempo.", crops.length ? `${al.length} en ${MESES_L[m - 1]}${altos ? ` · ${altos} con riesgo alto` : ""}` : "Añade parcelas con cultivo"],
+    ["ajustes", "⚙️", "Ajustes", "Ubicación, estación meteorológica, servicios SIGPAC y copias de seguridad.", esc(S.settings.lugar)]
+  ].map(([h, i, t, d, s]) => `<a class="tile" href="#${h}"><div class="ti">${i}</div><div class="tt">${t}</div><div class="td">${d}</div><div class="ts">${esc(s)}</div><div class="go">Entrar →</div></a>`).join("");
+
+  // tiempo
+  if (S.wx) {
+    const c = S.wx.current, [ic, tx] = WMO(c.weather_code); const d0 = S.wx.days[0], d1 = S.wx.days[1];
+    const w = (day, lbl) => day.win ? `<div class="win ok" style="padding:6px 8px;border-radius:8px;margin-top:6px">${lbl}: buena ventana de ${pad(day.win.from)}:00 a ${pad(day.win.to)}:00 h</div>` : `<div class="win no" style="padding:6px 8px;border-radius:8px;margin-top:6px">${lbl}: sin ventana adecuada (viento, lluvia o temperatura)</div>`;
+    $("#homeWx").innerHTML = `<div class="wx-now"><div class="ic">${ic}</div><div><div class="t">${f1(c.temperature_2m)} °C</div><div class="muted small">${tx} · HR ${Math.round(c.relative_humidity_2m)} % · viento ${f1(c.wind_speed_10m)} km/h</div></div></div>${w(d0, "Hoy")}${w(d1, "Mañana")}`;
+  } else if (S.station.rows.length) {
+    const r = S.station.rows[S.station.rows.length - 1];
+    $("#homeWx").innerHTML = `<p class="small muted" style="margin-top:0">Predicción no disponible. Último dato de ${esc(S.station.name)} (${fDate(r.date)}):</p><div class="kpi"><div class="v">${f1(r.tmax)} / ${f1(r.tmin)} °C</div><div class="s">Lluvia ${f1(r.precip)} mm · HR ${f1(r.hr)} % · ETo ${f1(r.eto)} mm</div></div>`;
+  } else $("#homeWx").innerHTML = `<p class="small muted" style="margin:0">${S.online === false ? "La predicción en vivo no está disponible en esta vista. Importa datos de tu estación en <a href='#tiempo'>Tiempo y estación</a>." : "Cargando predicción…"}</p>`;
+
+  // alertas
+  if (!crops.length) $("#homeAlerts").innerHTML = `<p class="small muted" style="margin:0">Añade parcelas con su cultivo en <a href="#parcelas">Parcelas SIGPAC</a> para ver solo tus alertas.</p>`;
+  else {
+    const rows = al.map(a => ({ a, r: evalRisk(a) })).sort((x, y) => rank(y.r) - rank(x.r)).slice(0, 6);
+    $("#homeAlerts").innerHTML = rows.length ? `<ul class="list-plain">${rows.map(({ a, r }) => `<li><b>${esc(a.n)}</b> <span class="muted small">(${esc(a.c)})</span> ${r ? `<span class="badge ${r.lvl}">riesgo ${r.lvl}</span>` : `<span class="badge gris">en periodo</span>`}</li>`).join("")}</ul><p style="margin:8px 0 0"><a href="#alertas" class="small">Ver todas →</a></p>` : `<p class="small muted" style="margin:0">Sin alertas este mes para tus cultivos.</p>`;
+  }
+  // PS
+  $("#homePS").innerHTML = ps.length ? `<ul class="list-plain">${ps.slice(0, 6).map(x => `<li><b>${esc(parcName(x.parcelaId))}</b>: ${esc(x.producto)} — no cosechar hasta el <b>${fDate(x.hasta)}</b></li>`).join("")}</ul>` : `<p class="small muted" style="margin:0">No hay plazos de seguridad en curso.</p>`;
+  const last = S.trat.slice().sort((a, b) => (b.fecha || "").localeCompare(a.fecha || "")).slice(0, 5);
+  $("#homeLast").innerHTML = last.length ? `<ul class="list-plain">${last.map(x => `<li>${fDate(x.fecha)} · <span class="badge ${x.tipo}">${x.tipo === "fito" ? "Fito" : "Ferti"}</span> ${esc(x.producto)} <span class="muted small">en ${esc(parcName(x.parcelaId))}</span></li>`).join("")}</ul>` : `<p class="small muted" style="margin:0">Aún no hay aplicaciones. <a href="#cuaderno">Registrar la primera →</a></p>`;
+}
+const rank = r => !r ? 1 : r.lvl === "alto" ? 3 : r.lvl === "medio" ? 2 : 0;
+const parcName = id => (S.parcelas.find(p => p.id === id) || {}).nombre || "Parcela eliminada";
+
+/* ============ TIEMPO ============ */
+function renderTiempo() {
+  if (S.wx) {
+    const c = S.wx.current, [ic, tx] = WMO(c.weather_code);
+    $("#wxNow").innerHTML = `<div class="wx-now"><div class="ic">${ic}</div><div><div class="t">${f1(c.temperature_2m)} °C</div><div class="muted">${tx}</div></div>
+      <div class="small">Humedad relativa: <b>${Math.round(c.relative_humidity_2m)} %</b><br>Viento: <b>${f1(c.wind_speed_10m)} km/h</b><br>Precipitación: <b>${f1(c.precipitation)} mm</b></div></div>
+      <p class="small muted" style="margin:10px 0 0">${esc(S.settings.lugar)} (${S.settings.lat.toFixed(3)}, ${S.settings.lon.toFixed(3)}) · actualizado a las ${S.wx.at.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</p>`;
+    $("#wxDays").innerHTML = `<div class="days">${S.wx.days.map(d => { const [i] = WMO(d.code); const dt = new Date(d.date + "T12:00:00");
+      return `<div class="day"><div class="d">${DIAS[dt.getDay()]} ${dt.getDate()}</div><div class="ic">${i}</div><div class="tt">${f1(d.tmax)}° / ${f1(d.tmin)}°</div>
+      <div class="muted">💧 ${f1(d.precip)} mm${d.pprob !== null ? ` · ${d.pprob}%` : ""}</div><div class="muted">💨 ${f1(d.vmax)} km/h</div><div class="muted">ETo ${f1(d.eto)} mm</div>
+      ${d.win ? `<div class="win ok">Tratar ${pad(d.win.from)}-${pad(d.win.to)} h</div>` : `<div class="win no">No tratar</div>`}</div>`; }).join("")}</div>`;
+  } else {
+    const msg = S.online === false ? `La predicción en vivo necesita conexión con Open-Meteo, que no está disponible en esta vista. Funciona al alojar la página en una web propia. Mientras tanto puedes importar los datos de tu estación aquí abajo.` : "Cargando predicción…";
+    $("#wxNow").innerHTML = `<p class="small muted" style="margin:0">${msg}</p>`; $("#wxDays").innerHTML = `<p class="small muted" style="margin:0">${msg}</p>`;
+  }
+  $("#wxRules").innerHTML = `<ul class="list-plain"><li>Hora apta: viento por debajo de 11 km/h (≈3 m/s), sin lluvia en esa hora ni en las 3 siguientes y entre 5 y 28 °C.</li><li>Con viento fuerte aumenta la deriva; con calor, la evaporación y el riesgo de fitotoxicidad; con lluvia inmediata, el lavado del producto.</li><li>Respeta siempre las condiciones de la etiqueta del producto y las bandas de seguridad.</li></ul>`;
+  if (S.wx) {
+    const ds = S.wx.days, sum = k => ds.reduce((a, d) => a + (d[k] || 0), 0);
+    const best = ds.filter(d => d.win).sort((a, b) => b.win.hours - a.win.hours)[0];
+    $("#wxWeek").innerHTML = `<ul class="list-plain"><li>Lluvia prevista: <b>${f1(sum("precip"))} mm</b> en 7 días${ds.some(d => d.precip >= 10) ? " (algún día con más de 10 mm)" : ""}.</li>
+      <li>Máxima de la semana: <b>${f1(Math.max(...ds.map(d => d.tmax)))} °C</b> · mínima: <b>${f1(Math.min(...ds.map(d => d.tmin)))} °C</b>${ds.some(d => d.tmin <= 0) ? ' · <b style="color:var(--bad)">riesgo de helada</b>' : ""}.</li>
+      <li>ETo acumulada: <b>${f1(sum("eto"))} mm</b> (referencia para el riego).</li>
+      <li>Días con ventana de tratamiento: <b>${ds.filter(d => d.win).length} de ${ds.length}</b>${best ? `; la mejor, el ${DIAS[new Date(best.date + "T12:00:00").getDay()]} ${+best.date.slice(8)} de ${pad(best.win.from)} a ${pad(best.win.to)} h` : ""}.</li></ul>`;
+    const H = S.wx.hours; let g = `<div class="hourgrid"><div></div>${Array.from({ length: 16 }, (_, k) => `<div class="hh">${k + 6}</div>`).join("")}`;
+    ds.forEach(d => {
+      const dt = new Date(d.date + "T12:00:00"); g += `<div class="dl">${DIAS[dt.getDay()]} ${dt.getDate()}</div>`;
+      for (let h = 6; h <= 21; h++) { const i = H.findIndex(x => x.date === d.date && x.h === h); if (i < 0) { g += `<div class="hc n"></div>`; continue; } const [c, why] = hourStatus(H, i); g += `<div class="hc ${c}" title="${pad(h)}:00 · ${esc(why)}"></div>`; }
+    });
+    g += `</div><div class="legend"><span><i style="background:#86c796"></i>Apta para tratar</span><span><i style="background:#f2b6ab"></i>No recomendable</span><span>Pasa el ratón (o toca) una casilla para ver el motivo.</span></div>`;
+    g += `<div class="tablewrap" style="margin-top:12px;max-height:none"><table><thead><tr><th>Día</th><th>Mejor ventana</th><th class="num">Horas aptas</th><th class="num">Viento máx.</th><th class="num">Lluvia</th></tr></thead><tbody>${ds.map(d => `<tr><td>${DIAS[new Date(d.date + "T12:00:00").getDay()]} ${fDate(d.date)}</td><td>${d.win ? `<span class="badge bajo">${pad(d.win.from)}:00 – ${pad(d.win.to)}:00</span>` : `<span class="badge alto">sin ventana</span>`}</td><td class="num">${d.win ? d.win.hours : 0}</td><td class="num">${f1(d.vmax)} km/h</td><td class="num">${f1(d.precip)} mm</td></tr>`).join("")}</tbody></table></div>`;
+    $("#wxWin").innerHTML = g;
+  } else {
+    const msg = S.online === false ? "Las ventanas hora a hora necesitan la predicción en vivo (Open-Meteo), que no está disponible en esta vista. Funcionan al alojar la página en una web propia." : "Cargando predicción…";
+    $("#wxWeek").innerHTML = `<p class="muted" style="margin:0">${msg}</p>`; $("#wxWin").innerHTML = `<p class="small muted" style="margin:0">${msg}</p>`;
+  }
+  renderStation();
+}
+function renderStation() {
+  const sel = $("#stSel"), s = S.settings;
+  const withD = ESTACIONES.map(e => ({ ...e, d: distKm(s.lat, s.lon, e.lat, e.lon) }));
+  sel.innerHTML = `<option value="">— Elige una estación —</option>` + PROVINCIAS.map(p => `<optgroup label="${p}">${withD.filter(e => e.prov === p).sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).map(e => `<option value="${e.code}">${e.code} · ${esc(e.nombre)} (${esc(e.comarca)}) · ${Math.round(e.d)} km</option>`).join("")}</optgroup>`).join("");
+  sel.value = s.stCode || "";
+  const near = nearestStation(s.lat, s.lon);
+  $("#stNear").innerHTML = near ? (near.code === s.stCode ? `Es la estación más cercana a ${esc(s.lugar)} (≈${Math.round(near.d)} km).` : `La más cercana a ${esc(s.lugar)} es <b>${near.code} · ${esc(near.nombre)}</b> (≈${Math.round(near.d)} km). <a href="#" data-act="usarCercana" data-code="${near.code}">Usar esta</a>`) + ` <span class="muted">Distancias aproximadas.</span>` : "";
+  renderStationStatus();
+  const st = S.station; $("#stName").textContent = st.rows.length ? `${st.name || "Estación"} · ${st.rows.length} días · del ${fDate(st.rows[0].date)} al ${fDate(st.rows[st.rows.length - 1].date)}${st.updated ? " · guardado el " + new Date(st.updated).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : ""}` : "";
+  if (!st.rows.length) { $("#stBody").innerHTML = `<div class="empty">${s.stCode ? `Aún no hay datos de ${esc(s.stName)}. Se descargan solos al abrir la página (con la web alojada y el script diario), o puedes descargar el CSV en la <a href="${LINK_SIAR}" target="_blank" rel="noopener">Consulta SiAR</a> e importarlo.` : "Elige tu estación en el desplegable."}</div>`; return; }
+  const rows = st.rows, last30 = rows.slice(-30), last7 = rows.slice(-7), y = String(new Date().getFullYear());
+  const sum = (a, k) => a.reduce((s, x) => s + (x[k] || 0), 0);
+  const gdd = rows.filter(r => r.date.startsWith(y)).reduce((s, r) => s + Math.max(0, ((r.tmax ?? r.tmed) + (r.tmin ?? r.tmed)) / 2 - 10), 0);
+  const hasEto = rows.some(r => r.eto !== null);
+  $("#stBody").innerHTML = `<div class="grid g4" style="margin-bottom:12px">
+    <div class="kpi"><div class="l">Lluvia 7 días</div><div class="v">${f1(sum(last7, "precip"))} mm</div></div>
+    <div class="kpi"><div class="l">Lluvia 30 días</div><div class="v">${f1(sum(last30, "precip"))} mm</div></div>
+    <div class="kpi"><div class="l">ETo 7 días</div><div class="v">${hasEto ? f1(sum(last7, "eto")) + " mm" : "—"}</div></div>
+    <div class="kpi"><div class="l">Integral térmica ${y}</div><div class="v">${f1(gdd)}</div><div class="s">grados-día base 10 °C</div></div></div>
+    <div class="chart">${chartSVG(last30)}</div>
+    <details style="margin-top:10px"><summary class="small">Ver tabla de datos</summary><div class="tablewrap" style="margin-top:8px;max-height:300px"><table><thead><tr><th>Fecha</th><th class="num">Tmáx</th><th class="num">Tmín</th><th class="num">Tmed</th><th class="num">HR %</th><th class="num">Lluvia</th><th class="num">ETo</th></tr></thead><tbody>
+    ${rows.slice().reverse().slice(0, 120).map(r => `<tr><td>${fDate(r.date)}</td><td class="num">${f1(r.tmax)}</td><td class="num">${f1(r.tmin)}</td><td class="num">${f1(r.tmed)}</td><td class="num">${f1(r.hr)}</td><td class="num">${f1(r.precip)}</td><td class="num">${f1(r.eto)}</td></tr>`).join("")}</tbody></table></div></details>`;
+}
+function chartSVG(rows) {
+  const W = 760, H = 220, L = 38, R = 38, T = 14, B = 28, iw = W - L - R, ih = H - T - B, n = rows.length;
+  if (!n) return "";
+  const ts = rows.flatMap(r => [r.tmax, r.tmin]).filter(v => v !== null);
+  let tmin = Math.floor(Math.min(...ts) / 5) * 5, tmax = Math.ceil(Math.max(...ts) / 5) * 5; if (tmax === tmin) tmax += 5;
+  const pmax = Math.max(10, ...rows.map(r => r.precip || 0));
+  const x = i => L + (n === 1 ? iw / 2 : i * iw / (n - 1)), yt = v => T + ih - (v - tmin) / (tmax - tmin) * ih, yp = v => T + ih - v / pmax * ih;
+  const bw = Math.max(3, iw / n * 0.6);
+  const line = k => rows.map((r, i) => r[k] === null ? null : `${x(i).toFixed(1)},${yt(r[k]).toFixed(1)}`).filter(Boolean).join(" ");
+  let g = "";
+  for (let v = tmin; v <= tmax; v += 5) g += `<line x1="${L}" x2="${W - R}" y1="${yt(v)}" y2="${yt(v)}" stroke="#e6e9e1"/><text x="${L - 6}" y="${yt(v) + 4}" font-size="11" text-anchor="end" fill="#7a8473">${v}°</text>`;
+  g += `<text x="${W - R + 6}" y="${T + 10}" font-size="11" fill="#2b5c86">${Math.round(pmax)} mm</text><text x="${W - R + 6}" y="${T + ih}" font-size="11" fill="#2b5c86">0</text>`;
+  rows.forEach((r, i) => { if (r.precip > 0) g += `<rect x="${(x(i) - bw / 2).toFixed(1)}" y="${yp(r.precip).toFixed(1)}" width="${bw.toFixed(1)}" height="${(T + ih - yp(r.precip)).toFixed(1)}" fill="#9cc3e4" rx="2"/>`; });
+  const step = Math.ceil(n / 8); rows.forEach((r, i) => { if (i % step === 0 || i === n - 1) g += `<text x="${x(i)}" y="${H - 8}" font-size="11" text-anchor="middle" fill="#7a8473">${r.date.slice(8)}/${r.date.slice(5, 7)}</text>`; });
+  g += `<polyline points="${line("tmax")}" fill="none" stroke="#c0532f" stroke-width="2"/><polyline points="${line("tmin")}" fill="none" stroke="#2f6b3a" stroke-width="2"/>`;
+  g += `<g font-size="11.5"><rect x="${L}" y="0" width="10" height="3" fill="#c0532f" transform="translate(0,4)"/><text x="${L + 14}" y="10" fill="#444">T máx</text><rect x="${L + 60}" y="4" width="10" height="3" fill="#2f6b3a"/><text x="${L + 74}" y="10" fill="#444">T mín</text><rect x="${L + 120}" y="2" width="10" height="8" fill="#9cc3e4"/><text x="${L + 134}" y="10" fill="#444">Lluvia</text></g>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Temperaturas y lluvia de los últimos ${n} días">${g}</svg>`;
+}
+/* Descarga los datos de la estación seleccionada. auto=true: llamada al abrir/recargar la página o al cambiar de estación */
+async function syncStation(auto) {
+  const code = S.settings.stCode, tpl = S.settings.stUrl || DEF_SETTINGS.stUrl;
+  if (tpl.includes("{codigo}") && !code) { if (auto !== true) toast("Elige primero una estación en el desplegable"); return; }
+  const url = tpl.replace(/\{codigo\}/g, encodeURIComponent(code));
+  S.stStatus = { cls: "load", msg: `Actualizando datos de ${S.settings.stName || code}…` }; renderStationStatus();
+  try {
+    const txt = await (await fetchWithTimeout(url, 15000)).text();
+    const rows = parseStationText(txt);
+    await saveStation(rows, S.settings.stName, url);
+    const last = rows[rows.length - 1];
+    S.stStatus = { cls: "ok", msg: `✓ Datos actualizados a las ${new Date().toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })} · último día disponible: ${fDate(last.date)}` };
+    if (auto !== true) toast(`Estación actualizada: ${rows.length} días`);
+  } catch (e) {
+    const sandbox = !!window.claude || S.online === false;
+    S.stStatus = { cls: "err", msg: sandbox
+      ? "En esta vista no se pueden descargar datos automáticamente. Descarga el CSV de la estación en la Consulta SiAR e impórtalo con «Importar CSV», o usa la web alojada en tu sitio."
+      : `No se han podido actualizar los datos desde «${url}» (${e.message || "sin conexión"}). Comprueba que el script diario está activo o importa el CSV.` };
+    if (auto !== true) toast("No se pudo actualizar la estación");
+  }
+  rerender();
+}
+function renderStationStatus() { const el = $("#stStatus"); if (el) el.innerHTML = S.stStatus ? `<div class="ststatus ${S.stStatus.cls}">${esc(S.stStatus.msg)}</div>` : ""; }
+
+/* ============ PARCELAS / MAPA ============ */
+let map = null, parcLayer = null, drawPts = [], drawLine = null, drawing = false, tileErrors = 0;
+function initMap() {
+  if (map) { map.invalidateSize(); drawParcels(); return; }
+  if (typeof L === "undefined") { $("#map").innerHTML = `<div class="empty">No se ha podido cargar el mapa. Revisa la conexión.</div>`; return; }
+  map = L.map("map", { zoomControl: true }).setView([S.settings.lat, S.settings.lon], 13);
+  const pnoa = L.tileLayer("https://www.ign.es/wmts/pnoa-ma?request=GetTile&service=WMTS&VERSION=1.0.0&Layer=OI.OrthoimageCoverage&Style=default&Format=image/jpeg&TileMatrixSet=GoogleMapsCompatible&TileMatrix={z}&TileRow={y}&TileCol={x}", { maxZoom: 20, maxNativeZoom: 19, attribution: "PNOA © IGN" });
+  const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" });
+  const sig = L.tileLayer.wms(S.settings.wmsUrl, { layers: S.settings.wmsLayer, format: "image/png", transparent: true, version: "1.3.0", minZoom: 14, attribution: "SIGPAC © FEGA" });
+  [pnoa, osm, sig].forEach(l => l.on("tileerror", () => { tileErrors++; if (tileErrors === 4) mapNote(); }));
+  pnoa.addTo(map); sig.addTo(map);
+  L.control.layers({ "Ortofoto PNOA": pnoa, "Mapa (OSM)": osm }, { "Recintos SIGPAC": sig }).addTo(map);
+  L.control.scale({ imperial: false }).addTo(map);
+  parcLayer = L.featureGroup().addTo(map);
+  map.on("click", e => { if (!drawing) return; drawPts.push([e.latlng.lat, e.latlng.lng]); if (drawLine) map.removeLayer(drawLine); drawLine = L.polygon(drawPts, { color: "#ffcc00", weight: 2, dashArray: "4 4" }).addTo(map); });
+  drawParcels(true);
+}
+function mapNote() { $("#mapNote").innerHTML = `<div class="banner warn" style="margin:0 0 10px">No se cargan la ortofoto ni la capa SIGPAC (sin conexión con los servidores del IGN/FEGA en esta vista). Tus parcelas guardadas se siguen viendo; al alojar la web en un servidor propio aparecerán las capas.</div>`; }
+const CROP_COLORS = { "Cítricos": "#f59e0b", "Arroz": "#10b981", "Vid": "#8b5cf6", "Caqui": "#f97316", "Olivo": "#84cc16", "Almendro": "#ec4899", "Frutales de hueso": "#ef4444", "Hortícolas (tomate)": "#06b6d4", "Otro": "#94a3b8" };
+function drawParcels(fit) {
+  if (!map) return; parcLayer.clearLayers();
+  S.parcelas.forEach(p => {
+    if (!p.geom) return;
+    const col = CROP_COLORS[p.cultivo] || "#94a3b8"; const sel = p.id === S.selParc;
+    const lyr = L.geoJSON({ type: "Feature", geometry: p.geom }, { style: { color: sel ? "#fff" : col, weight: sel ? 3 : 2, fillColor: col, fillOpacity: .3 } });
+    lyr.bindTooltip(`${p.nombre} · ${p.cultivo || "—"}`, { sticky: true });
+    lyr.on("click", () => { if (!drawing) selectParc(p.id); });
+    lyr.addTo(parcLayer);
+  });
+  if (fit && parcLayer.getLayers().length) map.fitBounds(parcLayer.getBounds(), { padding: [20, 20], maxZoom: 17 });
+}
+function selectParc(id, zoom) {
+  S.selParc = id; renderPlist(); drawParcels();
+  const p = S.parcelas.find(x => x.id === id);
+  if (zoom && map && p && p.geom) map.fitBounds(L.geoJSON(p.geom).getBounds(), { padding: [30, 30], maxZoom: 18 });
+}
+function renderParcelas() { renderPlist(); if (map) drawParcels(); renderParcTable(); }
+function renderParcTable() {
+  const y = String(new Date().getFullYear()), tot = S.parcelas.reduce((a, p) => a + (num(p.sup) || 0), 0);
+  const byC = {}; S.parcelas.forEach(p => { const c = p.cultivo || "Sin cultivo"; byC[c] = (byC[c] || 0) + (num(p.sup) || 0); });
+  const top = Object.entries(byC).sort((a, b) => b[1] - a[1]);
+  $("#parcKpis").innerHTML = `<div class="card kpi"><div class="l">Parcelas</div><div class="v">${S.parcelas.length}</div></div><div class="card kpi"><div class="l">Superficie total</div><div class="v">${f2(tot)} ha</div></div>` +
+    top.slice(0, 2).map(([c, s]) => `<div class="card kpi"><div class="l">${esc(c)}</div><div class="v">${f2(s)} ha</div><div class="s">${tot ? Math.round(s / tot * 100) : 0} % de la superficie</div></div>`).join("");
+  if (!S.parcelas.length) { $("#parcTable").innerHTML = `<div class="empty">Aún no hay parcelas. Créalas desde la pestaña <a href="#parcelas-mapa">Mapa</a>.</div>`; return; }
+  $("#parcTable").innerHTML = `<table><thead><tr><th>Parcela</th><th>Cultivo</th><th>Variedad</th><th>Comarca</th><th>Ref. SIGPAC</th><th>Uso</th><th class="num">Superficie</th><th class="num">Aplic. ${y}</th><th>Última aplicación</th><th></th></tr></thead><tbody>${S.parcelas.slice().sort((a, b) => a.nombre.localeCompare(b.nombre)).map(p => {
+    const ts = S.trat.filter(t => t.parcelaId === p.id).sort((a, b) => (b.fecha || "").localeCompare(a.fecha || "")); const last = ts[0];
+    return `<tr><td><b>${esc(p.nombre)}</b></td><td>${esc(p.cultivo || "—")}</td><td>${esc(p.variedad || "—")}</td><td>${esc(p.comarca || "—")}</td><td>${esc(refTxt(p.ref) || "—")}</td><td>${esc(p.uso || "—")}</td><td class="num">${f2(num(p.sup))} ha</td><td class="num">${ts.filter(t => (t.fecha || "").startsWith(y)).length}</td><td>${last ? `${fDate(last.fecha)} · ${esc(last.producto)}` : "—"}</td>
+      <td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="zoomParc" data-id="${p.id}">Mapa</button><button class="btn sm" data-act="editParc" data-id="${p.id}">Editar</button><button class="btn sm" data-act="tratParc" data-id="${p.id}">+ Aplicación</button></div></td></tr>`; }).join("")}</tbody></table>`;
+}
+function renderPlist() {
+  $("#pCount").textContent = S.parcelas.length;
+  if (!S.parcelas.length) { $("#plist").innerHTML = `<div class="empty small">Aún no hay parcelas. Busca un recinto SIGPAC, dibuja una parcela o importa un archivo.</div>`; return; }
+  $("#plist").innerHTML = S.parcelas.slice().sort((a, b) => a.nombre.localeCompare(b.nombre)).map(p => `
+    <div class="pitem ${p.id === S.selParc ? "sel" : ""}" data-pid="${p.id}">
+      <div class="row" style="justify-content:space-between"><span class="n">${esc(p.nombre)}</span><span class="badge" style="background:${CROP_COLORS[p.cultivo] || "#94a3b8"}22;color:#333">${esc(p.cultivo || "—")}</span></div>
+      <div class="m">${f2(num(p.sup))} ha${p.variedad ? " · " + esc(p.variedad) : ""}${p.comarca ? " · " + esc(p.comarca) : ""}</div>
+      ${refTxt(p.ref) ? `<div class="m">SIGPAC ${esc(refTxt(p.ref))}${p.uso ? " · uso " + esc(p.uso) : ""}</div>` : ""}
+      <div class="row" style="margin-top:6px">
+        <button class="btn sm" data-act="zoomParc" data-id="${p.id}">Ver</button>
+        <button class="btn sm" data-act="editParc" data-id="${p.id}">Editar</button>
+        <button class="btn sm" data-act="tratParc" data-id="${p.id}">+ Aplicación</button>
+        <button class="btn sm" data-act="wxParc" data-id="${p.id}" title="Usar su ubicación para el tiempo">Tiempo aquí</button>
+        <button class="btn sm danger" data-act="delParc" data-id="${p.id}">Borrar</button>
+      </div></div>`).join("");
+}
+function startDraw() { if (!map) return; drawing = true; drawPts = []; $("#map").classList.add("leaflet-crosshair"); $("#btnDraw").hidden = true; $("#btnEnd").hidden = false; $("#btnCancel").hidden = false; toast("Haz clic en el mapa para marcar los vértices de la parcela"); }
+function endDraw(save) {
+  drawing = false; $("#map").classList.remove("leaflet-crosshair"); $("#btnDraw").hidden = false; $("#btnEnd").hidden = true; $("#btnCancel").hidden = true;
+  if (drawLine) { map.removeLayer(drawLine); drawLine = null; }
+  if (save) { if (drawPts.length < 3) { toast("Marca al menos 3 puntos"); return; } const ring = drawPts.map(([la, lo]) => [lo, la]); ring.push(ring[0]); parcForm({ geom: roundGeom({ type: "Polygon", coordinates: [ring] }) }); }
+  drawPts = [];
+}
+function sigpacSearchForm() {
+  openModal(`<h2>Buscar recinto SIGPAC</h2><p class="small muted" style="margin-top:0">Introduce la referencia SIGPAC (provincia 46 = Valencia, 12 = Castellón, 3 = Alicante). Agregado y zona suelen ser 0.</p>
+  <div class="fgrid">${["prov:Provincia", "mun:Municipio", "agr:Agregado", "zona:Zona", "pol:Polígono", "par:Parcela", "rec:Recinto"].map(s => { const [k, l] = s.split(":"); return `<label class="f">${l}<input id="q_${k}" type="number" min="0" value="${k === "agr" || k === "zona" ? 0 : k === "prov" ? 46 : ""}"></label>`; }).join("")}</div>
+  <p class="small muted">La consulta usa el servicio del FEGA configurado en Ajustes. Si no responde, descarga el recinto desde el visor SIGPAC oficial e impórtalo, o dibújalo sobre el mapa.</p>
+  <div id="qMsg" class="small"></div>
+  <div class="acts"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn pri" data-act="doSigpac">Buscar</button></div>`);
+}
+async function doSigpac() {
+  const ref = {}; for (const k of ["prov", "mun", "agr", "zona", "pol", "par", "rec"]) ref[k] = $("#q_" + k).value.trim();
+  if (!ref.prov || !ref.mun || !ref.pol || !ref.par || !ref.rec) { $("#qMsg").innerHTML = `<span style="color:var(--bad)">Rellena provincia, municipio, polígono, parcela y recinto.</span>`; return; }
+  const url = S.settings.recinfoUrl.replace(/\{(\w+)\}/g, (_, k) => ref[k] ?? "0");
+  $("#qMsg").textContent = "Consultando SIGPAC…";
+  try {
+    const j = await (await fetchWithTimeout(url, 12000)).json(); const gs = geomsFromGeoJSON(j);
+    if (!gs.length) throw new Error("sin geometría");
+    const p = gs[0].props || {}; const uso = p.uso_sigpac || p.uso || p.USO_SIGPAC || "";
+    closeModal(); parcForm({ geom: roundGeom(gs[0].geom), ref, uso, nombre: `Pol ${ref.pol} Parc ${ref.par} Rec ${ref.rec}` });
+  } catch (e) {
+    $("#qMsg").innerHTML = `<span style="color:var(--bad)">No se pudo consultar el recinto (${esc(e.message || "sin conexión")}).</span> Puedes guardar la parcela con su referencia y dibujarla o importarla después.
+    <div class="row" style="margin-top:8px"><button class="btn sm" data-act="parcSinGeom">Guardar solo la referencia</button></div>`;
+    S._pendingRef = ref;
+  }
+}
+async function importGeoFile(file) {
+  const txt = await file.text(); let gs = [];
+  try { gs = /\.kml$/i.test(file.name) ? geomsFromKML(txt) : geomsFromGeoJSON(JSON.parse(txt)); } catch (e) { toast("Archivo no válido"); return; }
+  if (!gs.length) { toast("No se han encontrado polígonos en el archivo"); return; }
+  if (gs.length === 1) { const g = gs[0]; const ref = refFromProps(g.props); parcForm({ geom: roundGeom(g.geom), ref, nombre: g.props.nombre || g.props.name || "", uso: g.props.uso_sigpac || "" }); return; }
+  let n = 0;
+  for (const g of gs.slice(0, 200)) { const ref = refFromProps(g.props); const p = { id: uid(), nombre: g.props.nombre || g.props.name || (refTxt(ref) ? `Pol ${ref.pol} Parc ${ref.par}${ref.rec ? " Rec " + ref.rec : ""}` : `Parcela importada ${++n}`), cultivo: "", variedad: "", prov: S.settings.prov, comarca: S.settings.comarca, ref, uso: g.props.uso_sigpac || "", geom: roundGeom(g.geom) }; p.sup = Math.round(areaHa(p.geom) * 10000) / 10000; S.parcelas.push(p); await S.store.putItem("parcelas", p); }
+  toast(`${Math.min(gs.length, 200)} parcelas importadas. Asígnales cultivo con «Editar».`); drawParcels(true); renderPlist();
+}
+function parcForm(init) {
+  const p = Object.assign({ id: null, nombre: "", cultivo: "", variedad: "", prov: S.settings.prov, comarca: S.settings.comarca, ref: { prov: "", mun: "", agr: 0, zona: 0, pol: "", par: "", rec: "" }, uso: "", geom: null, sup: null }, init);
+  if (p.geom && !p.sup) p.sup = Math.round(areaHa(p.geom) * 10000) / 10000;
+  S._editParc = p;
+  openModal(`<h2>${p.id ? "Editar parcela" : "Nueva parcela"}</h2>
+  <div class="fgrid">
+    <label class="f w2">Nombre<input id="p_nombre" value="${esc(p.nombre)}" placeholder="p. ej. Huerto de la Marjal"></label>
+    <label class="f">Cultivo<select id="p_cultivo"><option value="">—</option>${CULTIVOS.map(c => `<option ${c === p.cultivo ? "selected" : ""}>${c}</option>`).join("")}</select></label>
+    <label class="f">Variedad<input id="p_variedad" value="${esc(p.variedad)}"></label>
+    <label class="f">Provincia<select id="p_prov">${PROVINCIAS.map(c => `<option ${c === p.prov ? "selected" : ""}>${c}</option>`).join("")}</select></label>
+    <label class="f">Comarca<select id="p_comarca"></select></label>
+    <label class="f">Superficie (ha)<input id="p_sup" type="number" step="0.0001" value="${p.sup ?? ""}"></label>
+    <label class="f">Uso SIGPAC<input id="p_uso" value="${esc(p.uso)}" placeholder="CI, TA, FS, OV…"></label>
+  </div>
+  <div class="sec-t">Referencia SIGPAC</div>
+  <div class="fgrid">${["prov:Provincia", "mun:Municipio", "agr:Agregado", "zona:Zona", "pol:Polígono", "par:Parcela", "rec:Recinto"].map(s => { const [k, l] = s.split(":"); return `<label class="f">${l}<input id="pr_${k}" value="${esc(p.ref[k] ?? "")}"></label>`; }).join("")}</div>
+  <p class="small muted">${p.geom ? `Geometría cargada: ${f2(areaHa(p.geom))} ha calculadas sobre el polígono.` : "Sin geometría: podrás verla en el mapa cuando la dibujes o importes."}</p>
+  <div class="acts"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn pri" data-act="saveParc">Guardar</button></div>`);
+  const fillCom = () => { const pv = $("#p_prov").value; $("#p_comarca").innerHTML = `<option value="">—</option>` + (COMARCAS[pv] || []).map(c => `<option ${c === p.comarca ? "selected" : ""}>${esc(c)}</option>`).join(""); };
+  fillCom(); $("#p_prov").onchange = fillCom;
+}
+async function saveParc() {
+  const p = S._editParc; const nombre = $("#p_nombre").value.trim();
+  if (!nombre) { toast("Pon un nombre a la parcela"); return; }
+  const o = { ...p, id: p.id || uid(), nombre, cultivo: $("#p_cultivo").value, variedad: $("#p_variedad").value.trim(), prov: $("#p_prov").value, comarca: $("#p_comarca").value, sup: num($("#p_sup").value), uso: $("#p_uso").value.trim(), ref: {} };
+  for (const k of ["prov", "mun", "agr", "zona", "pol", "par", "rec"]) o.ref[k] = $("#pr_" + k).value.trim();
+  S.parcelas = S.parcelas.filter(x => x.id !== o.id).concat([o]); await S.store.putItem("parcelas", o);
+  closeModal(); toast("Parcela guardada"); S.selParc = o.id; renderPlist(); drawParcels(); if (map && o.geom) selectParc(o.id, true);
+}
+
+/* ============ CUADERNO ============ */
+const UNI_FITO = ["l/ha", "kg/ha", "cc/hl", "g/hl", "%", "ml/ha", "g/ha"];
+const UNI_FERT = ["kg/ha", "l/ha", "t/ha", "m³/ha"];
+function tratForm(init) {
+  if (!S.parcelas.length) { toast("Primero crea una parcela"); location.hash = "#parcelas"; return; }
+  const t = Object.assign({ id: null, tipo: "fito", fecha: today(), parcelaId: S.selParc || S.parcelas[0].id, sup: null, producto: "", nreg: "", ma: "", objetivo: "", dosis: "", unidad: "l/ha", caldo: "", ps: "", aplicador: "", ropo: "", equipo: "", ftipo: "Mineral", n: "", p: "", k: "", dens: "1", metodo: "", obs: "" }, init);
+  S._editTrat = t;
+  openModal(`<h2>${t.id ? "Editar aplicación" : "Nueva aplicación"}</h2>
+  <div class="row" style="margin-bottom:10px"><label class="btn sm"><input type="radio" name="t_tipo" value="fito" ${t.tipo === "fito" ? "checked" : ""}> Fitosanitario</label><label class="btn sm"><input type="radio" name="t_tipo" value="ferti" ${t.tipo === "ferti" ? "checked" : ""}> Fertilizante</label></div>
+  <div class="fgrid">
+    <label class="f">Fecha<input id="t_fecha" type="date" value="${t.fecha}"></label>
+    <label class="f w2">Parcela<select id="t_parc">${S.parcelas.map(p => `<option value="${p.id}" ${p.id === t.parcelaId ? "selected" : ""}>${esc(p.nombre)} (${esc(p.cultivo || "—")})</option>`).join("")}</select></label>
+    <label class="f">Superficie tratada (ha)<input id="t_sup" type="number" step="0.0001" value="${t.sup ?? ""}"></label>
+    <label class="f w2">Producto comercial<input id="t_prod" value="${esc(t.producto)}"></label>
+  </div>
+  <div id="fitoBox"><div class="sec-t">Fitosanitario</div><div class="fgrid">
+    <label class="f">Nº de registro<input id="t_nreg" value="${esc(t.nreg)}"></label>
+    <label class="f w2">Materia activa<input id="t_ma" value="${esc(t.ma)}"></label>
+    <label class="f w2">Plaga / enfermedad<input id="t_obj" list="objList" value="${esc(t.objetivo)}"><datalist id="objList"></datalist></label>
+    <label class="f">Dosis<input id="t_dosis" type="number" step="any" value="${esc(t.dosis)}"></label>
+    <label class="f">Unidad<select id="t_uni">${UNI_FITO.map(u => `<option ${u === t.unidad ? "selected" : ""}>${u}</option>`).join("")}</select></label>
+    <label class="f">Volumen de caldo (l/ha)<input id="t_caldo" type="number" step="any" value="${esc(t.caldo)}"></label>
+    <label class="f">Plazo de seguridad (días)<input id="t_ps" type="number" min="0" value="${esc(t.ps)}"></label>
+    <label class="f">Aplicador<input id="t_apl" value="${esc(t.aplicador)}"></label>
+    <label class="f">Nº carné / ROPO<input id="t_ropo" value="${esc(t.ropo)}"></label>
+    <label class="f w2">Equipo (nº ROMA / inspección)<input id="t_eq" value="${esc(t.equipo)}"></label>
+  </div></div>
+  <div id="fertBox"><div class="sec-t">Fertilizante</div><div class="fgrid">
+    <label class="f">Tipo<select id="t_ftipo">${["Mineral", "Orgánico", "Organomineral", "Foliar", "Fertirrigación", "Enmienda"].map(x => `<option ${x === t.ftipo ? "selected" : ""}>${x}</option>`).join("")}</select></label>
+    <label class="f">N (%)<input id="t_n" type="number" step="any" value="${esc(t.n)}"></label>
+    <label class="f">P₂O₅ (%)<input id="t_p" type="number" step="any" value="${esc(t.p)}"></label>
+    <label class="f">K₂O (%)<input id="t_k" type="number" step="any" value="${esc(t.k)}"></label>
+    <label class="f">Dosis<input id="t_fdosis" type="number" step="any" value="${esc(t.tipo === "ferti" ? t.dosis : "")}"></label>
+    <label class="f">Unidad<select id="t_funi">${UNI_FERT.map(u => `<option ${u === t.unidad ? "selected" : ""}>${u}</option>`).join("")}</select></label>
+    <label class="f">Densidad (kg/l)<input id="t_dens" type="number" step="any" value="${esc(t.dens)}"></label>
+    <label class="f">Método<input id="t_met" value="${esc(t.metodo)}" placeholder="Abonadora, riego…"></label>
+  </div><p class="small muted" id="ufPrev"></p></div>
+  <label class="f" style="margin-top:10px">Observaciones<textarea id="t_obs">${esc(t.obs)}</textarea></label>
+  <div class="acts"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn pri" data-act="saveTrat">Guardar</button></div>`);
+  const sync = () => {
+    const tipo = $$("input[name=t_tipo]").find(r => r.checked).value; $("#fitoBox").hidden = tipo !== "fito"; $("#fertBox").hidden = tipo !== "ferti";
+    const p = S.parcelas.find(x => x.id === $("#t_parc").value); $("#objList").innerHTML = ALERTAS.filter(a => !p || !p.cultivo || a.c === p.cultivo).map(a => `<option value="${esc(a.n)}">`).join("");
+    if (!$("#t_sup").value && p && p.sup) $("#t_sup").value = p.sup;
+    const uf = calcUF({ dosis: $("#t_fdosis").value, unidad: $("#t_funi").value, dens: $("#t_dens").value, n: $("#t_n").value, p: $("#t_p").value, k: $("#t_k").value });
+    $("#ufPrev").textContent = uf ? `Aporte: ${f1(uf.n)} UF N · ${f1(uf.p)} UF P₂O₅ · ${f1(uf.k)} UF K₂O por hectárea` : "Indica riqueza y dosis para calcular las unidades fertilizantes (UF/ha).";
+  };
+  $("#modal").oninput = sync; $("#modal").onchange = sync; sync();
+}
+function calcUF(t) {
+  const d = num(t.dosis); if (d === null) return null; const dens = num(t.dens) || 1;
+  const kg = { "kg/ha": d, "l/ha": d * dens, "t/ha": d * 1000, "m³/ha": d * 1000 * dens }[t.unidad]; if (kg === undefined) return null;
+  return { n: kg * (num(t.n) || 0) / 100, p: kg * (num(t.p) || 0) / 100, k: kg * (num(t.k) || 0) / 100 };
+}
+async function saveTrat() {
+  const tipo = $$("input[name=t_tipo]").find(r => r.checked).value; const prod = $("#t_prod").value.trim();
+  if (!prod) { toast("Indica el producto"); return; } if (!$("#t_fecha").value) { toast("Indica la fecha"); return; }
+  const p = S.parcelas.find(x => x.id === $("#t_parc").value);
+  const o = { id: S._editTrat.id || uid(), tipo, fecha: $("#t_fecha").value, parcelaId: $("#t_parc").value, cultivo: p ? p.cultivo : "", sup: num($("#t_sup").value), producto: prod, obs: $("#t_obs").value.trim() };
+  if (tipo === "fito") Object.assign(o, { nreg: $("#t_nreg").value.trim(), ma: $("#t_ma").value.trim(), objetivo: $("#t_obj").value.trim(), dosis: num($("#t_dosis").value), unidad: $("#t_uni").value, caldo: num($("#t_caldo").value), ps: num($("#t_ps").value), aplicador: $("#t_apl").value.trim(), ropo: $("#t_ropo").value.trim(), equipo: $("#t_eq").value.trim() });
+  else { Object.assign(o, { ftipo: $("#t_ftipo").value, n: num($("#t_n").value), p: num($("#t_p").value), k: num($("#t_k").value), dosis: num($("#t_fdosis").value), unidad: $("#t_funi").value, dens: num($("#t_dens").value) || 1, metodo: $("#t_met").value.trim() }); const uf = calcUF(o); if (uf) { o.ufN = uf.n; o.ufP = uf.p; o.ufK = uf.k; } }
+  S.trat = S.trat.filter(x => x.id !== o.id).concat([o]); await S.store.putItem("trat", o);
+  closeModal(); toast("Aplicación guardada"); rerender();
+}
+function filteredTrat() {
+  const y = $("#fAno").value, pc = $("#fParc").value, tp = $("#fTipo").value, q = norm($("#fTxt").value || "");
+  return S.trat.filter(x => (!y || (x.fecha || "").startsWith(y)) && (!pc || x.parcelaId === pc) && (!tp || x.tipo === tp) && (!q || norm([x.producto, x.ma, x.objetivo, x.nreg, x.obs, parcName(x.parcelaId)].join(" ")).includes(q))).sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+}
+function exportTrat() {
+  const y = $("#eAno").value, tp = $("#eTipo").value;
+  return S.trat.filter(x => (!y || (x.fecha || "").startsWith(y)) && (!tp || x.tipo === tp)).sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+}
+function renderCuaderno() {
+  const years = Array.from(new Set(S.trat.map(x => (x.fecha || "").slice(0, 4)).filter(Boolean).concat([String(new Date().getFullYear())]))).sort().reverse();
+  const keep = (sel, html) => { const v = sel.value; sel.innerHTML = html; if (v && Array.from(sel.options).some(o => o.value === v)) sel.value = v; };
+  for (const id of ["fAno", "bAno", "eAno"]) { keep($("#" + id), (id === "bAno" ? "" : `<option value="">Todos</option>`) + years.map(y => `<option>${y}</option>`).join("")); if (!$("#" + id)._init) { $("#" + id).value = years[0]; $("#" + id)._init = 1; } }
+  // plazos de seguridad
+  const ps = activePS(), t0 = today(), hace30 = addDays(t0, -30);
+  $("#psActivos").innerHTML = ps.length ? ps.map(x => { const tot = num(x.ps), rest = Math.round((new Date(x.hasta + "T12:00:00") - new Date(t0 + "T12:00:00")) / 864e5);
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="row" style="justify-content:space-between"><b>${esc(parcName(x.parcelaId))}</b><span class="badge alto">${rest} día${rest === 1 ? "" : "s"}</span></div><div class="small">${esc(x.producto)}${x.ma ? " (" + esc(x.ma) + ")" : ""} · aplicado el ${fDate(x.fecha)} · no cosechar hasta el <b>${fDate(x.hasta)}</b></div><div class="progress"><b style="width:${Math.min(100, Math.round(rest / tot * 100))}%"></b></div></div>`; }).join("") : `<p class="small muted" style="margin:0">No hay plazos de seguridad en curso. Puedes cosechar en todas las parcelas (según los tratamientos registrados).</p>`;
+  const done = S.trat.filter(x => x.tipo === "fito" && num(x.ps) > 0).map(x => ({ ...x, hasta: addDays(x.fecha, num(x.ps)) })).filter(x => x.hasta <= t0 && x.hasta >= hace30).sort((a, b) => b.hasta.localeCompare(a.hasta));
+  $("#psCumplidos").innerHTML = done.length ? `<ul class="list-plain">${done.map(x => `<li><b>${esc(parcName(x.parcelaId))}</b>: ${esc(x.producto)} · cumplido el ${fDate(x.hasta)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin:0">Ninguno en los últimos 30 días.</p>`;
+  const ex = exportTrat(); $("#eCount").textContent = `${ex.length} aplicaciones se exportarán con estos filtros.`;
+  keep($("#fParc"), `<option value="">Todas</option>` + S.parcelas.map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join(""));
+  const rows = filteredTrat(), t = today();
+  $("#tratTable").innerHTML = rows.length ? `<table><thead><tr><th>Fecha</th><th>Parcela</th><th>Tipo</th><th>Producto</th><th>Dosis</th><th>Detalle</th><th>Plazo de seguridad</th><th></th></tr></thead><tbody>${rows.map(x => {
+    const hasta = x.tipo === "fito" && num(x.ps) > 0 ? addDays(x.fecha, num(x.ps)) : null;
+    const det = x.tipo === "fito" ? `${esc(x.objetivo || "—")}${x.ma ? `<div class="muted small">${esc(x.ma)}${x.nreg ? " · Reg. " + esc(x.nreg) : ""}</div>` : ""}` : (x.ufN !== undefined ? `${f1(x.ufN)}-${f1(x.ufP)}-${f1(x.ufK)} UF/ha<div class="muted small">${esc(x.ftipo || "")}</div>` : esc(x.ftipo || ""));
+    return `<tr><td>${fDate(x.fecha)}</td><td>${esc(parcName(x.parcelaId))}<div class="muted small">${f2(num(x.sup))} ha</div></td><td><span class="badge ${x.tipo}">${x.tipo === "fito" ? "Fitosanitario" : "Fertilizante"}</span></td><td>${esc(x.producto)}</td><td class="num">${f2(num(x.dosis))} ${esc(x.unidad || "")}</td><td>${det}</td>
+      <td>${hasta ? (hasta > t ? `<span class="badge alto">hasta ${fDate(hasta)}</span>` : `<span class="badge bajo">cumplido</span>`) : "—"}</td>
+      <td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="editTrat" data-id="${x.id}">Editar</button><button class="btn sm" data-act="dupTrat" data-id="${x.id}" title="Duplicar">⧉</button><button class="btn sm danger" data-act="delTrat" data-id="${x.id}">✕</button></div></td></tr>`; }).join("")}</tbody></table>` : `<div class="empty">No hay aplicaciones con estos filtros.</div>`;
+  // balance
+  const y = $("#bAno").value; const inY = S.trat.filter(x => !y || (x.fecha || "").startsWith(y));
+  const bal = S.parcelas.map(p => { const ts = inY.filter(x => x.parcelaId === p.id); return { p, fito: ts.filter(x => x.tipo === "fito").length, n: ts.reduce((a, x) => a + (x.ufN || 0), 0), pp: ts.reduce((a, x) => a + (x.ufP || 0), 0), k: ts.reduce((a, x) => a + (x.ufK || 0), 0) }; });
+  $("#balance").innerHTML = bal.length ? `<div class="tablewrap" style="max-height:none"><table><thead><tr><th>Parcela</th><th>Cultivo</th><th class="num">Superficie</th><th class="num">Tratamientos fito</th><th class="num">N (UF/ha)</th><th class="num">P₂O₅ (UF/ha)</th><th class="num">K₂O (UF/ha)</th></tr></thead><tbody>${bal.map(b => `<tr><td>${esc(b.p.nombre)}</td><td>${esc(b.p.cultivo || "—")}</td><td class="num">${f2(num(b.p.sup))} ha</td><td class="num">${b.fito}</td><td class="num">${f1(b.n)}</td><td class="num">${f1(b.pp)}</td><td class="num">${f1(b.k)}</td></tr>`).join("")}</tbody></table></div><p class="small muted" style="margin:8px 0 0">Las UF/ha suman las aportaciones por hectárea registradas en el año. En zonas vulnerables a nitratos, compáralas con el límite del programa de actuación vigente.</p>` : `<p class="small muted" style="margin:0">Sin parcelas.</p>`;
+}
+function tratCSV() {
+  const cols = [["fecha", "Fecha"], ["parcela", "Parcela"], ["ref", "Ref. SIGPAC"], ["cultivo", "Cultivo"], ["sup", "Superficie (ha)"], ["tipo", "Tipo"], ["producto", "Producto"], ["nreg", "Nº registro"], ["ma", "Materia activa"], ["objetivo", "Plaga/enfermedad"], ["dosis", "Dosis"], ["unidad", "Unidad"], ["caldo", "Caldo (l/ha)"], ["ps", "Plazo seguridad (días)"], ["aplicador", "Aplicador"], ["ropo", "ROPO"], ["equipo", "Equipo"], ["ftipo", "Tipo fertilizante"], ["n", "N %"], ["p", "P2O5 %"], ["k", "K2O %"], ["ufN", "UF N/ha"], ["ufP", "UF P2O5/ha"], ["ufK", "UF K2O/ha"], ["metodo", "Método"], ["obs", "Observaciones"]];
+  const q = v => { v = v === null || v === undefined ? "" : typeof v === "number" ? String(Math.round(v * 1000) / 1000).replace(".", ",") : String(v); return /[;"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+  const rows = exportTrat().slice().reverse().map(x => { const p = S.parcelas.find(z => z.id === x.parcelaId) || {}; const o = { ...x, parcela: p.nombre || "", ref: refTxt(p.ref), tipo: x.tipo === "fito" ? "Fitosanitario" : "Fertilizante" }; return cols.map(([k]) => q(o[k])).join(";"); });
+  return [cols.map(c => c[1]).join(";")].concat(rows).join("\n");
+}
+async function copyText(txt, okMsg) { try { await navigator.clipboard.writeText(txt); toast(okMsg); } catch (e) { openModal(`<h2>Copia el contenido</h2><textarea style="width:100%;min-height:260px">${esc(txt)}</textarea><div class="acts"><button class="btn" data-act="closeModal">Cerrar</button></div>`); } }
+function download(name, txt, type) { if (window.claude) { copyText(txt, "Descarga no disponible en esta vista: contenido copiado al portapapeles"); return; } try { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + txt], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); } catch (e) { toast("Descarga no disponible aquí: usa Copiar"); } }
+
+/* ============ ALERTAS ============ */
+function renderAlertas() {
+  const crops = myCrops();
+  const ac = $("#aCult"), am = $("#aMes"), ap = $("#aProv");
+  if (!ac._init) {
+    ac.innerHTML = `<option value="mis">Mis cultivos${crops.length ? "" : " (sin parcelas)"}</option><option value="">Todos</option>` + CULTIVOS.filter(c => c !== "Otro").map(c => `<option>${c}</option>`).join("");
+    if (!crops.length) ac.value = "";
+    am.innerHTML = MESES_L.map((m, i) => `<option value="${i + 1}">${m[0].toUpperCase() + m.slice(1)}</option>`).join(""); am.value = new Date().getMonth() + 1;
+    ap.innerHTML = PROVINCIAS.map(p => `<option>${p}</option>`).join(""); ap.value = S.settings.prov;
+    ac._init = 1;
+  }
+  const cv = ac.value, mes = +am.value, prov = ap.value, solo = $("#aSolo").value === "mes";
+  const cs = cv === "mis" ? crops : cv ? [cv] : CULTIVOS;
+  const list = ALERTAS.filter(a => cs.includes(a.c) && (!solo || a.m.includes(mes)) && (!a.prov || a.prov.includes(prov)));
+  const curMonth = new Date().getMonth() + 1;
+  const rd = riskDays();
+  const items = list.map(a => ({ a, r: a.m.includes(mes) && mes === curMonth ? evalRisk(a) : null })).sort((x, y) => rank(y.r) - rank(x.r) || x.a.c.localeCompare(y.a.c));
+  $("#alList").innerHTML = items.length ? items.map(({ a, r }) => `<div class="al">
+    <div class="hd"><div><div class="nm">${esc(a.n)}</div><div class="sci">${esc(a.s)}</div></div>
+      <div style="text-align:right">${r ? `<span class="badge ${r.lvl}">riesgo ${r.lvl}</span>` : a.m.includes(mes) ? `<span class="badge gris">en periodo</span>` : `<span class="badge gris">fuera de periodo</span>`}</div></div>
+    <div class="row small"><span class="badge">${esc(a.c)}</span><span class="badge gris">${esc(a.t)}</span>${a.prov ? `<span class="badge medio">${esc(a.prov.join(", "))}</span>` : ""}</div>
+    <div class="months">${MESES.map((m, i) => `<span class="${a.m.includes(i + 1) ? "on" : ""} ${i + 1 === mes ? "now" : ""}">${m[0]}</span>`).join("")}</div>
+    <div class="small">${esc(a.nota)}${a.link ? ` <a href="${a.link}" target="_blank" rel="noopener">Más información ↗</a>` : ""}</div>
+    ${r ? `<div class="why">${esc(r.why)} · según ${esc(r.src)}</div>` : a.r && a.m.includes(mes) && mes === curMonth && !rd ? `<div class="why">Sin datos meteorológicos para calcular el riesgo.</div>` : ""}
+    <div class="row"><button class="btn sm" data-act="tratAlerta" data-n="${esc(a.n)}" data-c="${esc(a.c)}">Registrar tratamiento</button></div>
+  </div>`).join("") : `<div class="card empty" style="grid-column:1/-1">${cv === "mis" && !crops.length ? "Añade parcelas con cultivo para ver tus alertas, o elige «Todos» en Cultivo." : "No hay alertas con estos filtros."}</div>`;
+  renderCalendario(); renderRiesgo();
+}
+function renderCalendario() {
+  const sel = $("#cCult"), crops = myCrops();
+  if (!sel._init) { sel.innerHTML = (crops.length ? `<option value="mis">Mis cultivos</option>` : "") + CULTIVOS.filter(c => c !== "Otro").map(c => `<option>${c}</option>`).join(""); sel._init = 1; }
+  const cs = sel.value === "mis" ? crops : [sel.value], prov = S.settings.prov, cur = new Date().getMonth() + 1;
+  let html = `<table><thead><tr><th style="min-width:220px">Plaga / enfermedad</th><th>Tipo</th>${MESES.map((m, i) => `<th class="mc ${i + 1 === cur ? "cur" : ""}">${m}</th>`).join("")}</tr></thead><tbody>`;
+  for (const c of cs) {
+    const list = ALERTAS.filter(a => a.c === c && (!a.prov || a.prov.includes(prov)));
+    if (!list.length) continue;
+    html += `<tr><td colspan="14" style="background:#f6f8f3;font-weight:700">${esc(c)}</td></tr>`;
+    html += list.map(a => `<tr><td>${esc(a.n)}<div class="sci small muted"><i>${esc(a.s)}</i></div></td><td><span class="badge gris">${esc(a.t)}</span></td>${MESES.map((_, i) => `<td class="mc"><span class="${a.m.includes(i + 1) ? "on" : ""} ${i + 1 === cur ? "cur" : ""}" title="${a.m.includes(i + 1) ? "Periodo de riesgo" : ""}"></span></td>`).join("")}</tr>`).join("");
+  }
+  $("#alCal").innerHTML = html + `</tbody></table>`;
+}
+const REGLAS_TXT = {
+  mildiuVid: "Mildiu de la vid (regla 3-10): lluvia ≥10 mm en 48 h con mínimas ≥10 °C → alto; ≥5 mm con media ≥10 °C → medio.",
+  oidio: "Oídio: días con temperatura media entre 20 y 30 °C (≥5 alto, ≥3 medio).",
+  piricularia: "Piricularia del arroz: días con HR media ≥85 % y 20-28 °C (≥2 alto, 1 medio).",
+  repilo: "Repilo: días con lluvia ≥2 mm o HR ≥90 % y media de 10-20 °C (≥2 alto).",
+  mycos: "Mancha foliar del caqui: días con lluvia ≥2 mm o HR ≥85 % en primavera (≥2 alto).",
+  mildiuTomate: "Mildiu del tomate: HR ≥90 % o lluvia ≥3 mm con media de 10-25 °C.",
+  moscaOlivo: "Mosca del olivo: actividad con medias ≥20 °C y máximas <35 °C; el calor extremo la frena.",
+  moscaFruta: "Mosca de la fruta: actividad alta con medias ≥20 °C.",
+  calorSeco: "Ácaros (araña roja): días con máxima ≥30 °C y HR <55 %.",
+  lluviaFuerte: "Phytophthora (aguado): un día ≥30 mm o ≥50 mm en el periodo → alto.",
+  humedoTemplado: "Alternaria: días con HR ≥85 % o lluvia y media de 15-30 °C.",
+  lluviaTemplada: "Monilia, abolladura, mancha ocre: días de lluvia ≥2 mm con media de 7-22 °C.",
+  botrytis: "Botrytis: días con lluvia ≥3 mm o HR ≥85 % entre envero y vendimia."
+};
+function renderRiesgo() {
+  const crops = myCrops(), cs = crops.length ? crops : CULTIVOS, m = new Date().getMonth() + 1, rd = riskDays();
+  const list = ALERTAS.filter(a => a.r && cs.includes(a.c) && a.m.includes(m) && (!a.prov || a.prov.includes(S.settings.prov)));
+  if (!rd) $("#alRisk").innerHTML = `<p class="small muted" style="margin:0">Sin datos meteorológicos. Importa los datos de tu estación en <a href="#tiempo-estacion">Tiempo › Estación</a> o aloja la página en una web propia para usar la predicción.</p>`;
+  else if (!list.length) $("#alRisk").innerHTML = `<p class="small muted" style="margin:0">No hay enfermedades o plagas con regla meteorológica en periodo de riesgo este mes${crops.length ? " para tus cultivos" : ""}.</p>`;
+  else $("#alRisk").innerHTML = `<p class="small muted" style="margin-top:0">Calculado con ${esc(rd.src)}${crops.length ? "" : " · mostrando todos los cultivos (aún no tienes parcelas con cultivo)"}.</p><div class="tablewrap" style="max-height:none"><table><thead><tr><th>Cultivo</th><th>Plaga / enfermedad</th><th>Riesgo</th><th>Motivo</th><th></th></tr></thead><tbody>${list.map(a => ({ a, r: evalRisk(a) })).sort((x, y) => rank(y.r) - rank(x.r)).map(({ a, r }) => `<tr><td>${esc(a.c)}</td><td><b>${esc(a.n)}</b></td><td><span class="badge ${r.lvl}">${r.lvl}</span></td><td class="small">${esc(r.why)}</td><td><button class="btn sm" data-act="tratAlerta" data-n="${esc(a.n)}" data-c="${esc(a.c)}">Registrar</button></td></tr>`).join("")}</tbody></table></div>`;
+  $("#alRules").innerHTML = `<ul class="list-plain">${Object.values(REGLAS_TXT).map(t => `<li>${esc(t)}</li>`).join("")}</ul><p class="muted" style="margin:8px 0 0">Son reglas sencillas y orientativas, pensadas para priorizar visitas de campo; no sustituyen a los modelos ni a los avisos oficiales.</p>`;
+}
+
+/* ============ AJUSTES ============ */
+function renderAjustes() {
+  const s = S.settings;
+  $("#sLugar").value = s.lugar; $("#sLat").value = s.lat; $("#sLon").value = s.lon;
+  $("#sProv").innerHTML = PROVINCIAS.map(p => `<option ${p === s.prov ? "selected" : ""}>${p}</option>`).join("");
+  const fill = () => { $("#sCom").innerHTML = `<option value="">—</option>` + (COMARCAS[$("#sProv").value] || []).map(c => `<option ${c === s.comarca ? "selected" : ""}>${esc(c)}</option>`).join(""); };
+  fill(); $("#sProv").onchange = fill;
+  $("#sStUrl").value = s.stUrl || DEF_SETTINGS.stUrl; $("#sStAuto").checked = s.stAuto !== false; $("#sGeoAuto").checked = s.geoAuto !== false;
+  $("#sWms").value = s.wmsUrl; $("#sWmsLayer").value = s.wmsLayer; $("#sRecinfo").value = s.recinfoUrl;
+  $("#storeInfo").innerHTML = `Tus datos se guardan <b>${esc(S.store.label)}</b>. ${S.parcelas.length} parcelas · ${S.trat.length} aplicaciones · ${S.station.rows.length} días de estación.`;
+}
+async function saveSettings(patch) { Object.assign(S.settings, patch); await S.store.putDoc("settings", S.settings); updatePill(); }
+async function geoBuscar() {
+  const q = $("#geoQ").value.trim(); if (!q) return;
+  $("#geoRes").textContent = "Buscando…";
+  try {
+    const j = await (await fetchWithTimeout(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=es&countryCode=ES`)).json();
+    const r = j.results || []; if (!r.length) { $("#geoRes").textContent = "Sin resultados."; return; }
+    $("#geoRes").innerHTML = `<div class="row" style="margin-bottom:10px">${r.map((x, i) => `<button class="btn sm" data-act="geoPick" data-i="${i}">${esc(x.name)}${x.admin2 ? ", " + esc(x.admin2) : ""}</button>`).join("")}</div>`;
+    S._geo = r;
+  } catch (e) { $("#geoRes").textContent = "La búsqueda necesita conexión (no disponible en esta vista). Escribe la latitud y longitud a mano."; }
+}
+
+/* ============ modales ============ */
+function openModal(html) { const m = $("#modal"); m.oninput = null; m.onchange = null; m.innerHTML = html; $("#modalBg").classList.add("on"); }
+function closeModal() { const m = $("#modal"); m.oninput = null; m.onchange = null; $("#modalBg").classList.remove("on"); m.innerHTML = ""; }
+function confirmBox(msg) { return new Promise(res => { openModal(`<h2>¿Seguro?</h2><p>${esc(msg)}</p><div class="acts"><button class="btn" id="cbNo">Cancelar</button><button class="btn pri" id="cbYes">Sí, borrar</button></div>`); $("#cbNo").onclick = () => { closeModal(); res(false); }; $("#cbYes").onclick = () => { closeModal(); res(true); }; }); }
+$("#modalBg").addEventListener("click", e => { if (e.target.id === "modalBg") closeModal(); });
+
+/* ============ acciones ============ */
+const ACT = {
+  closeModal, nuevoTrat: () => tratForm({}), saveTrat, saveParc, doSigpac,
+  recargarWx: () => { toast("Actualizando…"); loadWeather(); },
+  syncStation, buscarSigpac: sigpacSearchForm, dibujar: startDraw, terminarDibujo: () => endDraw(true), cancelarDibujo: () => endDraw(false),
+  parcSinGeom: () => { const ref = S._pendingRef; closeModal(); parcForm({ ref, nombre: `Pol ${ref.pol} Parc ${ref.par} Rec ${ref.rec}` }); },
+  zoomParc: b => { S.selParc = b.dataset.id; if (location.hash !== "#parcelas-mapa") location.hash = "#parcelas-mapa"; setTimeout(() => selectParc(b.dataset.id, true), 120); },
+  nuevaParcSinMapa: () => parcForm({}),
+  editParc: b => parcForm(S.parcelas.find(p => p.id === b.dataset.id)),
+  tratParc: b => tratForm({ parcelaId: b.dataset.id }),
+  wxParc: async b => { const p = S.parcelas.find(x => x.id === b.dataset.id); const c = p && p.geom ? centroid(p.geom) : null; if (!c) { toast("La parcela no tiene geometría"); return; } await saveSettings({ lat: Math.round(c[0] * 1e4) / 1e4, lon: Math.round(c[1] * 1e4) / 1e4, lugar: p.nombre, prov: p.prov || S.settings.prov, comarca: p.comarca || S.settings.comarca }); toast("Ubicación del tiempo: " + p.nombre); loadWeather(); },
+  delParc: async b => { const p = S.parcelas.find(x => x.id === b.dataset.id); const n = S.trat.filter(t => t.parcelaId === p.id).length; if (!(await confirmBox(`Se borrará «${p.nombre}».${n ? ` Sus ${n} aplicaciones se conservarán en el cuaderno.` : ""}`))) return; S.parcelas = S.parcelas.filter(x => x.id !== p.id); await S.store.delItem("parcelas", p.id); if (S.selParc === p.id) S.selParc = null; renderPlist(); drawParcels(); },
+  editTrat: b => tratForm(S.trat.find(t => t.id === b.dataset.id)),
+  dupTrat: b => { const t = S.trat.find(x => x.id === b.dataset.id); tratForm({ ...t, id: null, fecha: today() }); },
+  delTrat: async b => { if (!(await confirmBox("Se borrará esta aplicación del cuaderno."))) return; S.trat = S.trat.filter(x => x.id !== b.dataset.id); await S.store.delItem("trat", b.dataset.id); rerender(); },
+  copiarCSV: () => copyText(tratCSV(), "CSV copiado: pégalo en Excel u Hojas de cálculo"),
+  descargarCSV: () => download(`cuaderno_${today()}.csv`, tratCSV(), "text/csv;charset=utf-8"),
+  tratAlerta: b => { const p = S.parcelas.find(x => x.cultivo === b.dataset.c); tratForm({ objetivo: b.dataset.n, parcelaId: p ? p.id : undefined }); },
+  geoBuscar,
+  geoPick: b => { const r = S._geo[+b.dataset.i]; $("#sLugar").value = r.name; $("#sLat").value = Math.round(r.latitude * 1e4) / 1e4; $("#sLon").value = Math.round(r.longitude * 1e4) / 1e4; const pv = PROVINCIAS.find(p => norm(r.admin2 || "").includes(norm(p).slice(0, 5))); if (pv) { $("#sProv").value = pv; $("#sProv").onchange(); } },
+  guardarUbic: async () => { const lat = num($("#sLat").value), lon = num($("#sLon").value); if (lat === null || lon === null) { toast("Latitud y longitud no válidas"); return; } await saveSettings({ geoAuto: $("#sGeoAuto").checked }); await setLocation({ lugar: $("#sLugar").value.trim() || "Mi zona", lat, lon, prov: $("#sProv").value, comarca: $("#sCom").value, src: "manual" }); },
+  guardarEst: async () => { await saveSettings({ stUrl: $("#sStUrl").value.trim() || DEF_SETTINGS.stUrl, stAuto: $("#sStAuto").checked }); toast("Guardado"); syncStation(true); },
+  toggleLoc: () => { const p = $("#locPop"); p.hidden = !p.hidden; if (!p.hidden) { $("#locQ").value = ""; $("#locRes").innerHTML = ""; $("#geoMsg").textContent = S.settings.locSrc === "gps" ? "Ahora usas la ubicación de tu dispositivo." : ""; setTimeout(() => $("#locQ").focus(), 30); } },
+  geoMe: () => geoMe(false),
+  pickLoc: async b => { const p = S._locRes[+b.dataset.i]; $("#locPop").hidden = true; await setLocation({ lugar: p.name, lat: p.lat, lon: p.lon, prov: p.prov, comarca: p.comarca, src: "busqueda" }); },
+  usarCercana: b => selectStation(b.dataset.code, false),
+  guardarSig: async () => { await saveSettings({ wmsUrl: $("#sWms").value.trim() || DEF_SIG.wmsUrl, wmsLayer: $("#sWmsLayer").value.trim() || DEF_SIG.wmsLayer, recinfoUrl: $("#sRecinfo").value.trim() || DEF_SIG.recinfoUrl }); toast("Guardado. Recarga la página para aplicar la capa WMS."); },
+  resetSig: async () => { await saveSettings({ ...DEF_SIG }); renderAjustes(); toast("Servicios SIGPAC restablecidos"); },
+  copiarBackup: () => copyText(JSON.stringify({ app: "agropanel", v: 1, settings: S.settings, parcelas: S.parcelas, trat: S.trat, station: S.station }), "Copia de seguridad copiada"),
+  descargarBackup: () => download(`agropanel_${today()}.json`, JSON.stringify({ app: "agropanel", v: 1, settings: S.settings, parcelas: S.parcelas, trat: S.trat, station: S.station }), "application/json"),
+  restaurar: async () => {
+    let j; try { j = JSON.parse($("#restoreTxt").value); } catch (e) { toast("JSON no válido"); return; }
+    if (j.app !== "agropanel") { toast("No es una copia de AgroPanel"); return; }
+    for (const p of j.parcelas || []) { if (!S.parcelas.some(x => x.id === p.id)) { S.parcelas.push(p); await S.store.putItem("parcelas", p); } }
+    for (const t of j.trat || []) { if (!S.trat.some(x => x.id === t.id)) { S.trat.push(t); await S.store.putItem("trat", t); } }
+    if (j.station && j.station.rows && j.station.rows.length) await saveStation(j.station.rows, j.station.name);
+    $("#restoreTxt").value = ""; toast("Copia restaurada"); rerender();
+  }
+};
+document.addEventListener("click", e => {
+  if (!e.target.closest(".locwrap")) $("#locPop").hidden = true;
+  const b = e.target.closest("[data-act]");
+  if (b) { e.preventDefault(); const f = ACT[b.dataset.act]; if (f) f(b); return; }
+  const pi = e.target.closest(".pitem"); if (pi) selectParc(pi.dataset.pid, true);
+});
+["fAno", "fParc", "fTipo", "bAno", "eAno", "eTipo"].forEach(id => $("#" + id).addEventListener("change", renderCuaderno));
+$("#fTxt").addEventListener("input", renderCuaderno);
+["aCult", "aMes", "aProv", "aSolo", "cCult"].forEach(id => $("#" + id).addEventListener("change", renderAlertas));
+$("#locQ").addEventListener("input", onLocSearch);
+$("#locQ").addEventListener("keydown", e => { if (e.key === "Enter") { const f = $("#locRes button"); if (f) f.click(); } if (e.key === "Escape") $("#locPop").hidden = true; });
+$("#stSel").addEventListener("change", e => { if (e.target.value) selectStation(e.target.value, false); });
+$("#stFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return; e.target.value = "";
+  try { const rows = parseStationText(await f.text()); await saveStation(rows, S.settings.stName || f.name.replace(/\.\w+$/, "")); toast(`Importados ${rows.length} días`); rerender(); }
+  catch (err) { toast("No se pudo leer el archivo: " + err.message); }
+});
+$("#geoFile").addEventListener("change", async e => { const f = e.target.files[0]; if (!f) return; e.target.value = ""; await importGeoFile(f); });
+
+function renderOfflineBanner() {
+  $("#offlineBanner").innerHTML = S.online === false ? `<div class="banner info"><span>ℹ️</span><span>Estás en modo sin conexión: la predicción en vivo, la búsqueda de recintos y las capas del mapa necesitan acceso a Open-Meteo, FEGA e IGN. Tus parcelas, el cuaderno, las alertas y la importación de datos de estación funcionan con normalidad.</span></div>` : "";
+}
+
+/* ============ arranque ============ */
+(async function boot() {
+  try {
+    S.store = await initStore();
+    let d;
+    try { d = await S.store.loadAll(); }
+    catch (e) { console.warn("Carga fallida, uso almacenamiento local", e); S.store = LocalStore; d = await LocalStore.loadAll(); toast("No se pudo acceder a tus datos en la nube; usando este navegador"); }
+    if (d.settings) S.settings = Object.assign({ ...DEF_SETTINGS }, d.settings);
+    if (d.station && Array.isArray(d.station.rows)) S.station = d.station;
+    S.parcelas = d.parcelas || []; S.trat = d.trat || [];
+  } catch (e) { console.error(e); S.store = LocalStore; }
+  $("#boot").remove(); updatePill(); showView();
+  // Estación: si no hay ninguna elegida, proponer la más cercana; después, actualizar sus datos en cada carga de la página
+  if (!S.settings.stCode && S.settings.stAuto !== false) { const n = nearestStation(S.settings.lat, S.settings.lon); if (n) await selectStation(n.code, true); }
+  else if (S.settings.stCode) syncStation(true);
+  loadWeather();
+  // Ubicación del dispositivo al abrir la página
+  if (S.settings.geoAuto !== false) geoMe(true);
+})();
+</script>
+</body>
+</html>

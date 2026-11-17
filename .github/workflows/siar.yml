@@ -1,0 +1,31 @@
+name: Actualizar datos SiAR
+
+on:
+  schedule:
+    - cron: "23 6 * * *"   # todos los días a las 06:23 UTC (07:23 en invierno, 08:23 en verano)
+  workflow_dispatch:        # permite lanzarlo a mano desde la pestaña "Actions"
+
+permissions:
+  contents: write
+
+jobs:
+  siar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Descargar datos de la consulta pública del SiAR (sin registro)
+        run: python scripts/actualizar_siar.py
+
+      - name: Guardar los datos en el repositorio
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add datos || true
+          git diff --staged --quiet || git commit -m "Datos SiAR $(date -u +%F)"
+          git push
