@@ -246,6 +246,8 @@ td.mc span.on{background:#b5d9a8}
 .hc.g{background:#6fbf7f}
 .foot{border-top:1px solid var(--line);padding-top:18px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.srcb{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;padding:1px 7px;border-radius:99px;background:#e3eefb;color:#255b80;margin-bottom:4px}
+.srcb.aemet{background:var(--lime);color:var(--forest)}
 /* --- Leaflet esencial (inlined) --- */
 .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
 .leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent;font:13px/1.4 Inter,system-ui,sans-serif;outline-offset:1px}
@@ -511,6 +513,13 @@ td.mc span.on{background:#b5d9a8}
         <p class="small muted">Columnas reconocidas: fecha, tmax, tmin, tmed (o temperatura), humedad/HR, precipitación/lluvia, ETo (EtPMon), viento. Separador ; o , y decimales con coma o punto. También el JSON de la API SiAR.</p>
         <div class="row"><button class="btn pri" data-act="guardarEst">Guardar</button></div>
       </div>
+      <div class="card"><h3>Fuentes de predicción</h3>
+        <p class="small muted" style="margin-top:0">AgroPanel usa el modelo del Centro Europeo (ECMWF IFS, 9 km) para toda la semana. Si añades tu clave gratuita de AEMET OpenData, hoy y mañana se mostrará la predicción horaria oficial de AEMET del municipio más cercano.</p>
+        <label class="f">Clave de AEMET OpenData<input id="sAemetKey" type="password" autocomplete="off" placeholder="Pega aquí la clave que recibes por correo"></label>
+        <p class="small muted">Se pide en <a href="https://opendata.aemet.es/centrodedescargas/altaUsuario" target="_blank" rel="noopener">opendata.aemet.es › Solicitar API Key</a>: solo hace falta un correo electrónico. La clave se guarda solo en tu navegador.</p>
+        <div class="row"><button class="btn pri" data-act="guardarAemet">Guardar y probar</button><button class="btn" data-act="quitarAemet">Quitar clave</button></div>
+        <p class="small" id="aemetInfo" style="margin:10px 0 0"></p>
+      </div>
       <div class="card"><h3>Servicios SIGPAC</h3>
         <div class="fgrid">
           <label class="f w2">URL del WMS de recintos<input id="sWms"></label>
@@ -744,7 +753,7 @@ const DEF_SIG = {
   wmsLayer: "recinto",
   recinfoUrl: "https://sigpac-hubcloud.es/servicioconsultassigpac/query/recinfo/{prov}/{mun}/{agr}/{zona}/{pol}/{par}/{rec}.geojson"
 };
-const DEF_SETTINGS = Object.assign({ lugar: "València", lat: 39.4699, lon: -0.3763, prov: "Valencia", comarca: "València", locSrc: "", stCode: "", stName: "", stUrl: "datos/{codigo}.json", stAuto: true, geoAuto: true }, DEF_SIG);
+const DEF_SETTINGS = Object.assign({ lugar: "València", lat: 39.4699, lon: -0.3763, prov: "Valencia", comarca: "València", locSrc: "", aemetKey: "", stCode: "", stName: "", stUrl: "datos/{codigo}.json", stAuto: true, geoAuto: true }, DEF_SIG);
 const S = { settings: { ...DEF_SETTINGS }, parcelas: [], trat: [], station: { code: "", name: "", rows: [], updated: null }, stStatus: null, wx: null, online: null, store: null, selParc: null };
 
 /* ============ almacenamiento ============ */
@@ -904,29 +913,111 @@ const ICP = {"sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 2
 const ico = (n, s = 20, sw = 1.8) => `<svg class="ic ic-${n}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICP[n]}</svg>`;
 
 const WMO = c => { const [n, t] = c === 0 ? ["sun","Despejado"] : c <= 2 ? ["partly","Poco nuboso"] : c === 3 ? ["cloud","Nuboso"] : c <= 48 ? ["fog","Niebla"] : c <= 57 ? ["drizzle","Llovizna"] : c <= 67 ? ["rain","Lluvia"] : c <= 77 ? ["snow","Nieve"] : c <= 82 ? ["drizzle","Chubascos"] : ["storm","Tormenta"]; return [ico(n, 32), t]; };
+/* Predicción combinada: ECMWF IFS 9 km (Open-Meteo) para toda la semana y AEMET OpenData para las primeras 48 h si hay clave */
+const OM_VARS = `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code` +
+  `&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code` +
+  `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,wind_speed_10m_max` +
+  `&timezone=Europe%2FMadrid&forecast_days=7`;
 async function loadWeather() {
   const { lat, lon } = S.settings;
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code` +
-    `&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m` +
-    `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,et0_fao_evapotranspiration,wind_speed_10m_max` +
-    `&timezone=Europe%2FMadrid&forecast_days=7`;
   try {
-    const j = await (await fetchWithTimeout(url)).json();
+    const j = await (await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&models=ecmwf_ifs,best_match${OM_VARS}`, 12000)).json();
+    if (j.error) throw new Error(j.reason || "Open-Meteo");
     S.wx = buildWx(j); S.online = true;
   } catch (e) { S.wx = null; S.online = false; }
+  if (S.wx && S.settings.aemetKey) {
+    try { await mergeAemet(S.wx); } catch (e) { S.wx.aemetErr = e.message || "sin respuesta"; }
+  }
   renderOfflineBanner(); rerender();
 }
+/* Toma el valor del ECMWF y, si falta, el del modelo automático de Open-Meteo */
+function pk(o, k, i) {
+  for (const s of ["_ecmwf_ifs", "_best_match", ""]) { const a = o[k + s]; if (a === undefined) continue; const v = i === undefined ? a : a[i]; if (v !== null && v !== undefined) return v; }
+  return null;
+}
 function buildWx(j) {
-  const H = j.hourly, D = j.daily;
-  const hours = H.time.map((t, i) => ({ t, date: t.slice(0, 10), h: +t.slice(11, 13), temp: H.temperature_2m[i], hr: H.relative_humidity_2m[i], p: H.precipitation[i], w: H.wind_speed_10m[i] }));
+  const H = j.hourly, D = j.daily, C = j.current || {};
+  const hours = H.time.map((t, i) => ({ t, date: t.slice(0, 10), h: +t.slice(11, 13), temp: pk(H, "temperature_2m", i), hr: pk(H, "relative_humidity_2m", i), p: pk(H, "precipitation", i) || 0, w: pk(H, "wind_speed_10m", i) || 0, code: pk(H, "weather_code", i), src: "ECMWF" }));
   const days = D.time.map((date, i) => {
-    const hs = hours.filter(x => x.date === date);
-    const hr = hs.length ? hs.reduce((a, x) => a + x.hr, 0) / hs.length : null;
-    const tmax = D.temperature_2m_max[i], tmin = D.temperature_2m_min[i];
-    return { date, code: D.weather_code[i], tmax, tmin, tmed: (tmax + tmin) / 2, hr, precip: D.precipitation_sum[i] || 0, pprob: D.precipitation_probability_max ? D.precipitation_probability_max[i] : null, eto: D.et0_fao_evapotranspiration ? D.et0_fao_evapotranspiration[i] : null, vmax: D.wind_speed_10m_max[i], win: treatWindow(hours, date) };
+    const hs = hours.filter(x => x.date === date && x.hr !== null);
+    const tmax = pk(D, "temperature_2m_max", i), tmin = pk(D, "temperature_2m_min", i);
+    return { date, code: pk(D, "weather_code", i) ?? 0, tmax, tmin, tmed: (tmax + tmin) / 2, hr: hs.length ? hs.reduce((a, x) => a + x.hr, 0) / hs.length : null, precip: pk(D, "precipitation_sum", i) || 0, pprob: pk(D, "precipitation_probability_max", i), eto: pk(D, "et0_fao_evapotranspiration", i), vmax: pk(D, "wind_speed_10m_max", i), win: treatWindow(hours, date), src: "ECMWF" };
   });
-  return { current: j.current, days, hours, at: new Date() };
+  const current = { temperature_2m: pk(C, "temperature_2m"), relative_humidity_2m: pk(C, "relative_humidity_2m"), wind_speed_10m: pk(C, "wind_speed_10m"), precipitation: pk(C, "precipitation") || 0, weather_code: pk(C, "weather_code") ?? 0 };
+  return { current, days, hours, at: new Date(), aemet: null, aemetErr: null };
+}
+
+/* ---------- AEMET OpenData (requiere clave gratuita) ---------- */
+async function aemetGet(path) {
+  const k = S.settings.aemetKey;
+  const r = await (await fetchWithTimeout(`https://opendata.aemet.es/opendata/api/${path}${path.includes("?") ? "&" : "?"}api_key=${encodeURIComponent(k)}`, 15000)).json();
+  if (Array.isArray(r)) return r;
+  if (r.estado && r.estado !== 200) throw new Error(r.descripcion || `AEMET respondió ${r.estado}`);
+  if (!r.datos) throw new Error("respuesta de AEMET sin datos");
+  const buf = await (await fetchWithTimeout(r.datos, 15000)).arrayBuffer();
+  let txt; try { txt = new TextDecoder("iso-8859-15").decode(buf); } catch (e) { txt = new TextDecoder().decode(buf); }
+  return JSON.parse(txt);
+}
+async function aemetMunicipio(lat, lon) {
+  let list = null;
+  try { list = JSON.parse(localStorage.getItem("agropanel_aemet_munis") || "null"); } catch (e) { }
+  if (!list) {
+    const all = await aemetGet("maestro/municipios");
+    list = all.filter(m => /^id(03|12|46)/.test(m.id || "")).map(m => ({ id: m.id.replace(/^id/, ""), n: m.nombre, lat: num(m.latitud_dec), lon: num(m.longitud_dec) })).filter(m => m.lat !== null && m.lon !== null);
+    if (!list.length) throw new Error("no se pudo leer la lista de municipios de AEMET");
+    try { localStorage.setItem("agropanel_aemet_munis", JSON.stringify(list)); } catch (e) { }
+  }
+  let best = null; for (const m of list) { const d = distKm(lat, lon, m.lat, m.lon); if (!best || d < best.d) best = { ...m, d }; }
+  return best;
+}
+/* Código de cielo de AEMET -> código equivalente de la escala WMO usada por los iconos */
+function skyToWmo(v) {
+  const c = parseInt(String(v || ""), 10); if (!c) return null;
+  if (c === 11) return 0; if (c === 12) return 1; if (c === 13 || c === 17) return 2; if (c >= 14 && c <= 16) return 3;
+  if (c >= 81 && c <= 83) return 45; if (c >= 43 && c <= 46) return 51; if (c >= 23 && c <= 26) return 61;
+  if ((c >= 33 && c <= 36) || (c >= 71 && c <= 74)) return 71; if ((c >= 51 && c <= 54) || (c >= 61 && c <= 64)) return 95; return 3;
+}
+function aemetHours(js) {
+  const dias = (Array.isArray(js) ? js[0] : js).prediccion.dia, out = [];
+  for (const d of dias) {
+    const date = String(d.fecha).slice(0, 10), byH = {};
+    const put = (arr, key, fn) => (arr || []).forEach(x => { if (x && /^\d{2}$/.test(x.periodo || "")) { (byH[+x.periodo] = byH[+x.periodo] || {})[key] = fn(x); } });
+    put(d.temperatura, "temp", x => num(x.value));
+    put(d.humedadRelativa, "hr", x => num(x.value));
+    put(d.precipitacion, "p", x => x.value === "Ip" ? 0.05 : num(x.value));
+    put(d.estadoCielo, "code", x => skyToWmo(x.value));
+    (d.vientoAndRachaMax || []).forEach(x => { if (x && x.velocidad && /^\d{2}$/.test(x.periodo || "")) (byH[+x.periodo] = byH[+x.periodo] || {}).w = num(x.velocidad[0]); });
+    Object.keys(byH).forEach(k => { const o = byH[k]; if (o.temp === null || o.temp === undefined) return; out.push({ t: `${date}T${pad(k)}:00`, date, h: +k, temp: o.temp, hr: o.hr ?? null, p: o.p ?? 0, w: o.w ?? 0, code: o.code ?? null, src: "AEMET" }); });
+  }
+  return out.sort((a, b) => a.t.localeCompare(b.t));
+}
+async function mergeAemet(wx) {
+  const m = await aemetMunicipio(S.settings.lat, S.settings.lon);
+  const hA = aemetHours(await aemetGet(`prediccion/especifica/municipio/horaria/${m.id}`));
+  const fechas = wx.days.slice(0, 2).map(d => d.date);
+  const byT = {}; wx.hours.forEach(x => byT[x.t] = x);
+  hA.filter(x => fechas.includes(x.date)).forEach(x => { byT[x.t] = x; });
+  wx.hours = Object.values(byT).sort((a, b) => a.t.localeCompare(b.t));
+  wx.days.slice(0, 2).forEach(day => {
+    const hs = wx.hours.filter(x => x.date === day.date), ha = hs.filter(x => x.src === "AEMET");
+    if (!ha.length) return;
+    const temps = hs.map(x => x.temp).filter(v => v !== null), hrs = hs.map(x => x.hr).filter(v => v !== null);
+    day.tmax = Math.max(...temps); day.tmin = Math.min(...temps); day.tmed = (day.tmax + day.tmin) / 2;
+    day.precip = hs.reduce((a, x) => a + (x.p || 0), 0);
+    day.hr = hrs.length ? hrs.reduce((a, v) => a + v, 0) / hrs.length : day.hr;
+    day.vmax = Math.max(day.vmax || 0, ...ha.map(x => x.w || 0));
+    const codes = ha.filter(x => x.h >= 8 && x.h <= 20 && x.code !== null).map(x => x.code);
+    if (codes.length) day.code = Math.max(...codes);
+    day.win = treatWindow(wx.hours, day.date);
+    day.src = "AEMET";
+  });
+  wx.aemet = { nombre: m.n, id: m.id, d: m.d };
+}
+function fuentesTxt() {
+  if (!S.wx) return "";
+  if (S.wx.aemet) return `Hoy y mañana: <b>AEMET</b> (predicción horaria de ${esc(S.wx.aemet.nombre)}) · Desde el tercer día: <b>ECMWF IFS 9 km</b>.`;
+  if (S.settings.aemetKey && S.wx.aemetErr) return `Todos los días: <b>ECMWF IFS 9 km</b>. No se pudo usar AEMET (${esc(S.wx.aemetErr)}); revisa tu clave en <a href="#ajustes">Ajustes</a>.`;
+  return `Todos los días: <b>ECMWF IFS 9 km</b>. Para usar AEMET en las primeras 48 h, añade tu clave gratuita en <a href="#ajustes">Ajustes</a>.`;
 }
 /* Ventana de tratamiento: horas de 6 a 21 con viento < 11 km/h (≈3 m/s), sin lluvia esa hora ni las 3 siguientes, y 5-28 °C */
 function hourStatus(hours, i) {
@@ -1126,8 +1217,8 @@ function renderTiempo() {
     $("#wxNow").innerHTML = `<div class="wx-now"><div class="ic">${ic}</div><div><div class="t">${f1(c.temperature_2m)} °C</div><div class="muted">${tx}</div></div>
       <div class="small">Humedad relativa: <b>${Math.round(c.relative_humidity_2m)} %</b><br>Viento: <b>${f1(c.wind_speed_10m)} km/h</b><br>Precipitación: <b>${f1(c.precipitation)} mm</b></div></div>
       <p class="small muted" style="margin:10px 0 0">${esc(S.settings.lugar)} (${S.settings.lat.toFixed(3)}, ${S.settings.lon.toFixed(3)}) · actualizado a las ${S.wx.at.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</p>`;
-    $("#wxDays").innerHTML = `<div class="days">${S.wx.days.map(d => { const [i] = WMO(d.code); const dt = new Date(d.date + "T12:00:00");
-      return `<div class="day"><div class="d">${DIAS[dt.getDay()]} ${dt.getDate()}</div><div class="ic">${i}</div><div class="tt">${f1(d.tmax)}° / ${f1(d.tmin)}°</div>
+    $("#wxDays").innerHTML = `<p class="small muted" style="margin:0 0 10px">${fuentesTxt()}</p><div class="days">${S.wx.days.map(d => { const [i] = WMO(d.code); const dt = new Date(d.date + "T12:00:00");
+      return `<div class="day"><div class="srcb ${d.src === "AEMET" ? "aemet" : ""}">${d.src}</div><div class="d">${DIAS[dt.getDay()]} ${dt.getDate()}</div><div class="ic">${i}</div><div class="tt">${f1(d.tmax)}° / ${f1(d.tmin)}°</div>
       <div class="muted">${ico("drop",14)} ${f1(d.precip)} mm${d.pprob !== null ? ` · ${d.pprob}%` : ""}</div><div class="muted">${ico("wind",14)} ${f1(d.vmax)} km/h</div><div class="muted">ETo ${f1(d.eto)} mm</div>
       ${d.win ? `<div class="win ok">Tratar ${pad(d.win.from)}-${pad(d.win.to)} h</div>` : `<div class="win no">No tratar</div>`}</div>`; }).join("")}</div>`;
   } else {
@@ -1147,7 +1238,7 @@ function renderTiempo() {
       const dt = new Date(d.date + "T12:00:00"); g += `<div class="dl">${DIAS[dt.getDay()]} ${dt.getDate()}</div>`;
       for (let h = 6; h <= 21; h++) { const i = H.findIndex(x => x.date === d.date && x.h === h); if (i < 0) { g += `<div class="hc n"></div>`; continue; } const [c, why] = hourStatus(H, i); g += `<div class="hc ${c}" title="${pad(h)}:00 · ${esc(why)}"></div>`; }
     });
-    g += `</div><div class="legend"><span><i style="background:#86c796"></i>Apta para tratar</span><span><i style="background:#f2b6ab"></i>No recomendable</span><span>Pasa el ratón (o toca) una casilla para ver el motivo.</span></div>`;
+    g += `</div><div class="legend"><span><i style="background:#86c796"></i>Apta para tratar</span><span>${fuentesTxt()}</span><span><i style="background:#f2b6ab"></i>No recomendable</span><span>Pasa el ratón (o toca) una casilla para ver el motivo.</span></div>`;
     g += `<div class="tablewrap" style="margin-top:12px;max-height:none"><table><thead><tr><th>Día</th><th>Mejor ventana</th><th class="num">Horas aptas</th><th class="num">Viento máx.</th><th class="num">Lluvia</th></tr></thead><tbody>${ds.map(d => `<tr><td>${DIAS[new Date(d.date + "T12:00:00").getDay()]} ${fDate(d.date)}</td><td>${d.win ? `<span class="badge bajo">${pad(d.win.from)}:00 – ${pad(d.win.to)}:00</span>` : `<span class="badge alto">sin ventana</span>`}</td><td class="num">${d.win ? d.win.hours : 0}</td><td class="num">${f1(d.vmax)} km/h</td><td class="num">${f1(d.precip)} mm</td></tr>`).join("")}</tbody></table></div>`;
     $("#wxWin").innerHTML = g;
   } else {
@@ -1531,7 +1622,7 @@ function renderAjustes() {
   $("#sProv").innerHTML = PROVINCIAS.map(p => `<option ${p === s.prov ? "selected" : ""}>${p}</option>`).join("");
   const fill = () => { $("#sCom").innerHTML = `<option value="">—</option>` + (COMARCAS[$("#sProv").value] || []).map(c => `<option ${c === s.comarca ? "selected" : ""}>${esc(c)}</option>`).join(""); };
   fill(); $("#sProv").onchange = fill;
-  $("#sStUrl").value = s.stUrl || DEF_SETTINGS.stUrl; $("#sStAuto").checked = s.stAuto !== false; $("#sGeoAuto").checked = s.geoAuto !== false;
+  $("#sAemetKey").value = s.aemetKey || ""; $("#aemetInfo").innerHTML = S.wx && S.wx.aemet ? `✓ AEMET activo: predicción de ${esc(S.wx.aemet.nombre)}.` : s.aemetKey && S.wx && S.wx.aemetErr ? `No se pudo usar AEMET: ${esc(S.wx.aemetErr)}.` : ""; $("#sStUrl").value = s.stUrl || DEF_SETTINGS.stUrl; $("#sStAuto").checked = s.stAuto !== false; $("#sGeoAuto").checked = s.geoAuto !== false;
   $("#sWms").value = s.wmsUrl; $("#sWmsLayer").value = s.wmsLayer; $("#sRecinfo").value = s.recinfoUrl;
   $("#storeInfo").innerHTML = `Tus datos se guardan <b>${esc(S.store.label)}</b>. ${S.parcelas.length} parcelas · ${S.trat.length} aplicaciones · ${S.station.rows.length} días de estación.`;
 }
@@ -1575,6 +1666,8 @@ const ACT = {
   geoPick: b => { const r = S._geo[+b.dataset.i]; $("#sLugar").value = r.name; $("#sLat").value = Math.round(r.latitude * 1e4) / 1e4; $("#sLon").value = Math.round(r.longitude * 1e4) / 1e4; const pv = PROVINCIAS.find(p => norm(r.admin2 || "").includes(norm(p).slice(0, 5))); if (pv) { $("#sProv").value = pv; $("#sProv").onchange(); } },
   guardarUbic: async () => { const lat = num($("#sLat").value), lon = num($("#sLon").value); if (lat === null || lon === null) { toast("Latitud y longitud no válidas"); return; } await saveSettings({ geoAuto: $("#sGeoAuto").checked }); await setLocation({ lugar: $("#sLugar").value.trim() || "Mi zona", lat, lon, prov: $("#sProv").value, comarca: $("#sCom").value, src: "manual" }); },
   guardarEst: async () => { await saveSettings({ stUrl: $("#sStUrl").value.trim() || DEF_SETTINGS.stUrl, stAuto: $("#sStAuto").checked }); toast("Guardado"); syncStation(true); },
+  guardarAemet: async () => { await saveSettings({ aemetKey: $("#sAemetKey").value.trim() }); $("#aemetInfo").textContent = "Probando la clave con AEMET…"; await loadWeather(); renderAjustes(); toast(S.wx && S.wx.aemet ? "AEMET conectado" : "No se pudo conectar con AEMET"); },
+  quitarAemet: async () => { await saveSettings({ aemetKey: "" }); $("#sAemetKey").value = ""; await loadWeather(); toast("Clave de AEMET eliminada"); },
   toggleLoc: () => { const p = $("#locPop"); p.hidden = !p.hidden; if (!p.hidden) { $("#locQ").value = ""; $("#locRes").innerHTML = ""; $("#geoMsg").textContent = S.settings.locSrc === "gps" ? "Ahora usas la ubicación de tu dispositivo." : ""; setTimeout(() => $("#locQ").focus(), 30); } },
   geoMe: () => geoMe(false),
   pickLoc: async b => { const p = S._locRes[+b.dataset.i]; $("#locPop").hidden = true; await setLocation({ lugar: p.name, lat: p.lat, lon: p.lon, prov: p.prov, comarca: p.comarca, src: "busqueda" }); },
