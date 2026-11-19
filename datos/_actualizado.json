@@ -1,8 +1,5 @@
 {
- "fecha": "2026-11-18T07:53:17.377604+00:00",
- "ok": 52,
- "fallos": [
-  "A21: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "A1020: <urlopen error _ssl.c:994: The handshake operation timed out>"
- ]
+ "fecha": "2026-11-19T07:52:13.468461+00:00",
+ "ok": 54,
+ "fallos": []
 }
